@@ -24,7 +24,8 @@
     <button type="button">Contact Us</button>
 
 <!-- Middle Part-->
-
+ 
+    <div>
     <h2>15</h2>
     <h7>Years Experience</h7>
     <h2>100+</h2>
@@ -33,6 +34,7 @@
     <h7>Medical Staff</h7>
     <h2>400+</h2>
     <h7>Patient Capacity</h7>
+    </div>
 
 <!-- 2nd Part-->
 
@@ -64,32 +66,102 @@
 
 <!-- 3rd Part-->
 
+    <div>
     <img src="imgexample.jpeg">
     <img src="imgexample.jpeg">
     <img src="imgexample.jpeg">
     <img src="imgexample.jpeg">
     <img src="imgexample.jpeg">
+    </div>
 
 <!-- Middle Part-->
 
     <h11>meet expert doctors for better care</h11>
     <h4>Let's Meet With Expert Doctors</h4>
     <h11>Let's meet with expert doctors who are ready to provide trusted care,accurate guidance.</h11> 
+    <div>
+        <img src="imgexample.jpeg">
+        <div>
+            <h7>Martin</h7>
+            <p>Srategic and Finance</p>
+            <img src="imgexample.jpeg">
+        </div>
+    </div>
+    
+    <div>
+        <img src="imgexample.jpeg">
+        <div>
+            <h7>Max Delly</h7>
+            <p>Srategic and Finance</p>
+            <img src="imgexample.jpeg">
+        </div>
+    </div>
 
-<!-- Bali yung mga ginamit ko jan na pang size ay yung 
- mga h1-h11 yung mga image nmn jan ay example lng yung 
- middle part nmn na tinutukoy jan ay yung makikita mong 
- maliliit na text before each main content tapos yung naka div 
- nmn jan ay parang grinoup ko dahil ganun yung nasa gayanan
- bali hulaan lng gnawa ko jan hindi pa sya finalize
+    <div>
+        <img src="imgexample.jpeg">
+        <div>
+            <h7>Shelly</h7>
+            <p>Srategic and Finance</p>
+            <img src="imgexample.jpeg">
+        </div>
+    </div>
 
- Tapos ang ginawa ko ay nilagay ko yung posible na makita sa 
- website pero walang ano mang design dahil sa class natin yun 
- ilalagay 
- Pwede rin mismong sa tag nlng ilagay kung sa kali
- Di pa to tapos papahinga lng ako sub muna a
- \
- Testing lang boss if nagana.... -->
+    <div>
+        <img src="imgexample.jpeg">
+        <div>
+            <h7>Kullok Dash</h7>
+            <p>Srategic and Finance</p>
+            <img src="imgexample.jpeg">
+        </div>
+    </div>
+    <div>
+        <img src="imgexample.jpeg">
+        <div>
+            <h7>Sarah</h7>
+            <p>Srategic and Finance</p>
+            <img src="imgexample.jpeg">
+        </div>
+    </div>
+
+<!-- 4th Part-->
+
+    <h4>Make an Appointment</h4>
+    <p>Name</p>
+    <input type="text" id="fname" name="fname">
+    <p>Email</p>
+    <input type="text" id="fname" name="fname">
+    <p>Select Date & Time</p>
+    <input type="text" id="fname" name="fname">
+    <button type="button">Book Appointment</button>
+    <img src="imgexample.jpeg">
+    <img src="imgexample.jpeg">
+    <img src="imgexample.jpeg">
+
+<!-- 5th Part-->
+    <h11>Meet expert doctor for better care</h11>
+    <h4>What Our Patients Say</h4>
+    <img src="imgexample.jpeg">
+    <img src="imgexample.jpeg">
+    <img src="imgexample.jpeg">
+    <img src="imgexample.jpeg">
+    <img src="imgexample.jpeg">
+    <button type="button">View All<img src="imgexample.jpeg"></button>
+
+<!-- 6th Part-->
+
+
+
+    <h2>Schedule Your Appointment With us </h2>
+    <p>Schedule your appointment with us easily and at your convenience. Choose your preferred time, and we'll ensure a smooth and hassle-free experience tailord to your needs.</p>
+    <img src="imgexample.jpeg">
+    <button type="button">Make a Schedule<img src="imgexample.jpeg"></button>
+    
+
+
+
+
+
+
 
 
 </body>
