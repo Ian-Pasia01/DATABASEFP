@@ -1,30 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h2, p {
+  margin: 10px;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333333;
+}
+
+ul li {
+  float: left;
+}
+
+ul li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+ul li a:hover:not(.active) {
+  background-color: #111111;
+}
+
+ul li a.active {
+  background-color: #04AA6D;
+}
+</style>
     <title>Web Application </title>
 </head>
 <body>
 <!-- 1st Part-->
-    <div>
-        <div>
-        Logo
-        </div>
-        <h3>CarePoint</h3>
-        <p>Home</p>
-        <p>About Us</p>
-        <p>Services</p>
-        <p>Blog</p>
-        <button type="button">Contact Us</button>
-    </div>
-    
+    <ul>
+        <li><img src="imgexample.jpeg"></li>
+        <li Style="color: white;"><h3>CarePoint</h3></li>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#About us">About Us</a></li>
+        <li><a href="#Services">Services</a></li>
+        <li><a href="#Blog">Blog</a></li>
+        <li style="float:right"><a href="#Contact Us"></a><button type="button">Contact Us</button></a></li>
+    </ul>
+
     <p>Your health your choice</p>
     <h1>Secure Your Doctor Visit Anytime, Anywhere</h1>
     <p>Easy schedule a medical consultation with your</p>
     <p>preferred doctor at a time that suits you best</p>
     <button type="button">Contact Us</button>
-
+    
 <!-- Middle Part-->
- 
+
     <div>
     <h2>15</h2>
     <h7>Years Experience</h7>
@@ -155,14 +191,6 @@
     <p>Schedule your appointment with us easily and at your convenience. Choose your preferred time, and we'll ensure a smooth and hassle-free experience tailord to your needs.</p>
     <img src="imgexample.jpeg">
     <button type="button">Make a Schedule<img src="imgexample.jpeg"></button>
-    
-
-
-
-
-
-
-
-
+ 
 </body>
 </html>
