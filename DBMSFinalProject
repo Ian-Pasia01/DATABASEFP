@@ -11,21 +11,28 @@ h2, p {
   margin: 10px;
 }
 
-ul {
+#Main ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333333;
+  background-color: #FBFCF8;
 }
 
+#Sec ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #E1F6FF;
+}
 ul li {
   float: left;
 }
 
 ul li a {
   display: block;
-  color: white;
+  color: black;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -43,6 +50,7 @@ ul li a.active {
 </head>
 <body>
 <!-- 1st Part-->
+	<div id="Main">
     <ul>
         <li><img src="imgexample.jpeg"></li>
         <li Style="color: white;"><h3>CarePoint</h3></li>
@@ -52,6 +60,7 @@ ul li a.active {
         <li><a href="#Blog">Blog</a></li>
         <li style="float:right"><a href="#Contact Us"></a><button type="button">Contact Us</button></a></li>
     </ul>
+	</div>
 
     <p>Your health your choice</p>
     <h1>Secure Your Doctor Visit Anytime, Anywhere</h1>
@@ -60,17 +69,34 @@ ul li a.active {
     <button type="button">Contact Us</button>
     
 <!-- Middle Part-->
-
-    <div>
+	<div id="Sec">
+    <ul>
+	<div>
+	<li>
     <h2>15</h2>
     <h7>Years Experience</h7>
+	</li>
+	</div>
+	<div>
+	<li>
     <h2>100+</h2>
     <h7>Expert Doctors</h7>
+	</li>
+	</div>
+	<div>
+	<li>
     <h2>200+</h2>
     <h7>Medical Staff</h7>
+	</li>
+	</div>
+	<div>
+	<li style="float:right">
     <h2>400+</h2>
     <h7>Patient Capacity</h7>
-    </div>
+	</li>
+	</div>
+    </ul>
+	</div>
 
 <!-- 2nd Part-->
 
@@ -191,6 +217,6 @@ ul li a.active {
     <p>Schedule your appointment with us easily and at your convenience. Choose your preferred time, and we'll ensure a smooth and hassle-free experience tailord to your needs.</p>
     <img src="imgexample.jpeg">
     <button type="button">Make a Schedule<img src="imgexample.jpeg"></button>
- 
+  
 </body>
 </html>
