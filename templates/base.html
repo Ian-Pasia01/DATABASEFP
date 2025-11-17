@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CarePoint - Clinic Management System{% endblock %}</title>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- HEADER / NAVIGATION -->
+    <header>
+        <div>
+            <strong>Logo</strong>
+            <h3>CarePoint</h3>
+            <nav>
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('about') }}">About Us</a>
+                <a href="#">Services</a>
+                <a href="#">Blog</a>
+                <button type="button">Contact Us</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER (if needed) -->
+    <footer>
+        {% block footer %}{% endblock %}
+    </footer>
+</body>
+</html>
