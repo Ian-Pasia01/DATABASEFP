@@ -1,0 +1,352 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    background-color: #f4f4f4;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Header */
+header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header strong {
+    font-size: 24px;
+    color: #007bff;
+}
+
+header h3 {
+    color: #333;
+    margin-left: 10px;
+}
+
+nav {
+    display: flex;
+    gap: 20px;
+}
+
+nav a {
+    color: #333;
+    font-weight: bold;
+}
+
+nav button {
+    background-color: #007bff;
+    color: white;
+}
+
+nav button:hover {
+    background-color: #0056b3;
+}
+
+/* Main Content */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Hero Section */
+#hero {
+    background: linear-gradient(135deg, #007bff, #28a745);
+    color: white;
+    text-align: center;
+    padding: 100px 20px;
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+#hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+#hero p {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#hero button {
+    background-color: white;
+    color: #007bff;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+#hero button:hover {
+    background-color: #e9ecef;
+}
+
+/* Stats Section */
+#stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+#stats div {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1;
+    margin: 0 10px;
+}
+
+#stats h2 {
+    font-size: 36px;
+    color: #007bff;
+}
+
+#stats p {
+    color: #666;
+}
+
+/* Services Section */
+#services {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+#services div {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1;
+}
+
+#services img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#services h5 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+#services label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#services ul {
+    list-style: none;
+    padding: 0;
+}
+
+#services li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#services button {
+    background-color: #28a745;
+    color: white;
+}
+
+#services button:hover {
+    background-color: #218838;
+}
+
+/* Achievements Section */
+#achievements {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+#achievements h2 {
+    color: #007bff;
+}
+
+#achievements h4 {
+    color: #666;
+}
+
+/* Gallery Section */
+#gallery {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 40px;
+    overflow-x: auto;
+}
+
+#gallery img {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Doctors Section */
+#doctors {
+    text-align: center;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+#doctors h2 {
+    color: #007bff;
+}
+
+#doctors h4 {
+    color: #666;
+}
+
+/* About Section */
+#about {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#about h1 {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+#about h2 {
+    color: #333;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+#about p {
+    margin-bottom: 20px;
+}
+
+/* Login Sections */
+#admin-login, #user-login {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#admin-login h1, #user-login h1 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#admin-login p, #user-login p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header div {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    #stats {
+        flex-direction: column;
+    }
+
+    #services {
+        flex-direction: column;
+    }
+
+    #hero h1 {
+        font-size: 36px;
+    }
+
+    #gallery {
+        flex-direction: column;
+        align-items: center;
+    }
+}
