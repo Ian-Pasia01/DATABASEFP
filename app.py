@@ -72,13 +72,31 @@ def login():
     
     return render_template('login.html', form=form, title='Login')
 
+
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
     form = AdminLog()
+    if session.get('role') == 'admin':
+        return redirect(url_for('admin_dashboard'))
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.AdminUser.data, role='admin').first()
+        if user and check_password_hash(user.password, form.passw.data):
+            session['user'] = user.username
+            session['role'] = user.role
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid admin credentials', 'danger')
+    
+    return render_template("admin_login.html", form=form)
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
     if session.get('role') != 'admin':
         flash('Access denied.', 'danger')
-        return redirect(url_for('user_login'))
-    return render_template("admin_login.html", form=form)
+        return redirect(url_for('admin_login'))
+    return render_template('admin_dashboard.html')
 
 
 
