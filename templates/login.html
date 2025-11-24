@@ -3,6 +3,7 @@
 
 <h1>Log In</h1>
 <form method="post">
+    {{ form.csrf_token }}
     {{ form.username.label }}
     {{ form.username() }}
 <br>

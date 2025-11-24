@@ -65,7 +65,7 @@ def login():
             if session['role'] == 'viewer':
                 return redirect(url_for('user_login'))  
             elif session['role'] == 'admin':
-                return redirect(url_for('admin_login'))  
+                return redirect(url_for('admin_dashboard'))  
         else:
             flash('Invalid credentials', 'danger')
     
@@ -80,23 +80,31 @@ def admin_login():
         return redirect(url_for('admin_dashboard'))
 
     if form.validate_on_submit():
+        flash('Form validated', 'info')
         user = User.query.filter_by(username=form.AdminUser.data, role='admin').first()
         if user and check_password_hash(user.password, form.passw.data):
+            flash('User found and password matched', 'info')
             session['user'] = user.username
             session['role'] = user.role
             flash('Admin login successful!', 'success')
             return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid admin credentials', 'danger')
-    
+    else:
+        flash('Form validation failed', 'warning')
+
     return render_template("admin_login.html", form=form)
+
+from models import db, User, AllLog
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if session.get('role') != 'admin':
         flash('Access denied.', 'danger')
         return redirect(url_for('admin_login'))
-    return render_template('admin_dashboard.html')
+
+    logs = AllLog.query.all()
+    return render_template('admin_dashboard.html', logs=logs)
 
 
 

@@ -7,3 +7,10 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password =db.Column(db.String(200), nullable = False)    
     role = db.Column(db.String(10), nullable=False)
+
+class AllLog(db.Model):
+    __tablename__ = 'alllog'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(10), nullable=False)
