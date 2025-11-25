@@ -144,10 +144,9 @@ if __name__ == "__main__":
         db.create_all()
 
         # If there’s no admin or viewer user yet, create them automatically
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', password=generate_password_hash('admin123'), role='admin')
-            viewer = User(username='viewer', password=generate_password_hash('viewer123'), role='viewer')
-            db.session.add_all([admin, viewer])
+        if not User.query.filter_by(username='Ian').first():
+            admin1 = User(username='Ian', password=generate_password_hash('Ian01'), role='admin')
+            db.session.add_all([admin1])
             db.session.commit()
 
     app.run(debug=True)
