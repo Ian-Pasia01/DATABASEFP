@@ -51,8 +51,8 @@ def user_login():
         if user and check_password_hash(Patient.password, Patient.password.data):
             session['user'] = Patient.username
             session['pass'] = Patient.password
-            flash('Login successful!', 'success') 
-             
+            flash('Login successful!', 'success')
+
             if session['pass'] == 'viewer':
                 return redirect(url_for('user_login'))
             elif session['role'] == 'admin':
