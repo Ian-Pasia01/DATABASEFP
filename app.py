@@ -27,11 +27,6 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-  # In production, hash passwords!
-
-    def __repr__(self):
-        return f'<Patient {self.full_name}>'
-
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -81,7 +76,6 @@ def admin_login():
     # Since admin login handled in /login, redirect all attempts to login
     return redirect(url_for('login'))
 
-from models import db, User, AllLog
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
@@ -89,7 +83,7 @@ def admin_dashboard():
         flash('Access denied.', 'danger')
         return redirect(url_for('admin_login'))
 
-    logs = AllLog.query.all()
+    logs = Patient.query.all()
     return render_template('admin_dashboard.html', logs=logs)
 
 
@@ -140,10 +134,9 @@ if __name__ == "__main__":
         db.create_all()
 
         # If there’s no admin or viewer user yet, create them automatically
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', password=generate_password_hash('admin123'), role='admin')
-            viewer = User(username='viewer', password=generate_password_hash('viewer123'), role='viewer')
-            db.session.add_all([admin, viewer])
+        if not User.query.filter_by(username='Ian').first():
+            admin1 = User(username='Ian', password=generate_password_hash('Ian01'), role='admin')
+            db.session.add_all([admin1])
             db.session.commit()
 
     app.run(debug=True)
