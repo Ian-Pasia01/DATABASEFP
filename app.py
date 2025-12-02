@@ -72,20 +72,20 @@ def login():
             
             
             if session['role'] == 'viewer':
-                return redirect(url_for('user_login'))  
+                return redirect(url_for('user_login'))
             elif session['role'] == 'admin':
-                return redirect(url_for('admin_dashboard'))  
+                return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid credentials', 'danger')
     
     
-    return render_template('login.html', form=form, title='Login')
+    return render_template('user_login.html', form=form, title='Login')
 
 
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
     # Since admin login handled in /login, redirect all attempts to login
-    return redirect(url_for('login'))
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/admin_dashboard')
