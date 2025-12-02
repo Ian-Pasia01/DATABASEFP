@@ -2,13 +2,24 @@ from flask import Flask, render_template, redirect, url_for, session, request, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from form import LoginForm, AdminLog
-from models import db, User
+from models import db, User, Patient
 
 app = Flask(__name__)
+
+@app.route('/patient_dashboard')
+def patient_dashboard():
+    if session.get('role') not in ['viewer', 'patient']:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('login'))
+    return render_template('patient_dashboard.html')
+
 
 app.config['SECRET_KEY'] = 'sikretongmalupet' 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/CarePoint'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+
 
 db.init_app(app)
 
@@ -16,15 +27,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-class Patient(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone_number = db.Column(db.String(20), nullable=False)
-    address = db.Column(db.Text, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    date_of_birth = db.Column(db.Date, nullable=True)
-    password = db.Column(db.String(200), nullable=False)  # In production, hash passwords!
+  # In production, hash passwords!
 
     def __repr__(self):
         return f'<Patient {self.full_name}>'
@@ -47,7 +50,7 @@ def user_login():
         # For now, just redirect to home (implement authentication later)
         return redirect(url_for("home"))
     return render_template("user_login.html")
-
+ 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()  
@@ -75,25 +78,8 @@ def login():
 
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
-    form = AdminLog()
-    if session.get('role') == 'admin':
-        return redirect(url_for('admin_dashboard'))
-
-    if form.validate_on_submit():
-        flash('Form validated', 'info')
-        user = User.query.filter_by(username=form.AdminUser.data, role='admin').first()
-        if user and check_password_hash(user.password, form.passw.data):
-            flash('User found and password matched', 'info')
-            session['user'] = user.username
-            session['role'] = user.role
-            flash('Admin login successful!', 'success')
-            return redirect(url_for('admin_dashboard'))
-        else:
-            flash('Invalid admin credentials', 'danger')
-    else:
-        flash('Form validation failed', 'warning')
-
-    return render_template("admin_login.html", form=form)
+    # Since admin login handled in /login, redirect all attempts to login
+    return redirect(url_for('login'))
 
 from models import db, User, AllLog
 
@@ -108,6 +94,8 @@ def admin_dashboard():
 
 
 
+
+from werkzeug.security import generate_password_hash
 
 @app.route("/user/signup", methods=["GET", "POST"])
 def user_signup():
@@ -131,9 +119,17 @@ def user_signup():
             address=address,
             gender=gender,
             date_of_birth=date_of_birth,
-            password=password  # In production, hash this!
+            password=generate_password_hash(password)  # Hash password securely
         )
         db.session.add(new_patient)
+
+        # Create corresponding User record for authentication
+        new_user = User(
+            username=email,  # Use email as username
+            password=generate_password_hash(password),
+            role='viewer'  # Assign role 'viewer' to patients
+        )
+        db.session.add(new_user)
         db.session.commit()
         return redirect(url_for("home"))
     return render_template("user_signup.html")
