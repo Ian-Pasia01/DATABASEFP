@@ -87,7 +87,7 @@ def admin_dashboard():
     logs = Patient.query.all()
     return render_template('admin_dashboard.html', logs=logs)
 
-
+admin_dashboard
 
 
 from werkzeug.security import generate_password_hash
