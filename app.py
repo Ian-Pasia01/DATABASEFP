@@ -2,10 +2,16 @@ from flask import Flask, render_template, redirect, url_for, session, request, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from form import LoginForm, AdminLog
-from models import db, User, Patient
+from models import db, User, Patient, Admin
 from datetime import datetime
 
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = 'sikretongmalupet'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/CarePoint'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
 
 @app.route('/patient_dashboard')
 def patient_dashboard():
@@ -13,16 +19,6 @@ def patient_dashboard():
         flash('Access denied.', 'danger')
         return redirect(url_for('login'))
     return render_template('patient_dashboard.html')
-
-
-app.config['SECRET_KEY'] = 'sikretongmalupet' 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/CarePoint'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-
-
-
-db.init_app(app)
 
 # Create all tables
 with app.app_context():
@@ -36,25 +32,28 @@ def home():
 def about():
     return render_template("about.html")
 
-
-
-
-
-
-
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('home'))
 
 
 @app.route('/user/login', methods=['GET', 'POST'])
 def user_login():
     if request.method == "POST":
-        user = Patient.query.filter_by(username=Patient.username.data).first()
-        if user and check_password_hash(Patient.password, Patient.password.data):
-            session['user'] = Patient.username
-            session['pass'] = Patient.password
-            flash('Login successful!', 'success') 
-             
-            if session['pass'] == 'viewer':
-                return redirect(url_for('user_login'))
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = Patient.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+            session['user'] = user.username
+            session['role'] = 'viewer'  # or user.role if you store roles in Patient
+            flash('Login successful!', 'success')
+
+            if session['role'] == 'viewer':
+                return redirect(url_for('patient_dashboard'))
             elif session['role'] == 'admin':
                 return redirect(url_for('admin_dashboard'))
         else:
@@ -64,60 +63,61 @@ def user_login():
 
 
 
-
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()  
+    form = LoginForm()
 
     if form.validate_on_submit():
-        
-        user = User.query.filter_by(username=form.username.data).first()
 
+        # Check if it's an admin login
+        admin = Admin.query.filter_by(username=form.username.data).first()
+        if admin and check_password_hash(admin.password, form.password.data):
+            session['user'] = admin.username
+            session['role'] = admin.role
+            flash('Login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
+
+        # Check if it's a regular user login
+        user = User.query.filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             session['user'] = user.username
             session['role'] = user.role
-            flash('Login successful!', 'success') 
-             
+            flash('Login successful!', 'success')
+
             if session['role'] == 'viewer':
-                return redirect(url_for('user_login'))
+                return redirect(url_for('home'))
             elif session['role'] == 'admin':
                 return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid credentials', 'danger')
-    
+
     return render_template('user_login.html', form=form, title='Login')
-
-
-
-
-
-
-
-
-
-
-
 
 
 
 
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
-    # Since admin login handled in /login, redirect all attempts to login
-    return redirect(url_for('login.html'))
+    form = AdminLog()
+    if form.validate_on_submit():
+        if form.AdminUser.data == 'admin' and form.passw.data == 'admin01':
+            session['user'] = 'admin'
+            session['role'] = 'admin'
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid admin credentials', 'danger')
+    return render_template('admin_login.html', form=form)
 
-
-@app.route('/admin_dashboard')
+@app.route('/admin/dashboard')
 def admin_dashboard():
     if session.get('role') != 'admin':
         flash('Access denied.', 'danger')
         return redirect(url_for('admin_login'))
 
-    logs = Patient.query.all()
-    return render_template('admin_dashboard.html', logs=logs)
-
+    # Example: show all patients in dashboard
+    patients = Patient.query.all()
+    return render_template('admin_dashboard.html', patients=patients)
 
 
 
