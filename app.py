@@ -37,15 +37,6 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/user_login", methods=["GET", "POST"])
-def user_login():
-    if request.method == "POST":
-        # Handle user login logic here
-        username = request.form.get("username")
-        password = request.form.get("password")
-        # For now, just redirect to home (implement authentication later)
-        return redirect(url_for("home"))
-    return render_template("user_login.html")
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -69,13 +60,13 @@ def login():
             flash('Invalid credentials', 'danger')
     
     
-    return render_template('user_login.html', form=form, title='Login')
+    return render_template('login.html', form=form, title='Login')
 
 
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
     # Since admin login handled in /login, redirect all attempts to login
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('login.html'))
 
 
 @app.route('/admin_dashboard')
