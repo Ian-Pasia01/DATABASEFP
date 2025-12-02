@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from form import LoginForm, AdminLog
 from models import db, User, Patient
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -94,12 +95,14 @@ from werkzeug.security import generate_password_hash
 @app.route("/user/signup", methods=["GET", "POST"])
 def user_signup():
     if request.method == "POST":
+        username = request.form.get("username")
         full_name = request.form.get("full_name")
         email = request.form.get("email")
         phone_number = request.form.get("phone_number")
         address = request.form.get("address")
         gender = request.form.get("gender")
         date_of_birth_str = request.form.get("date_of_birth")
+        country_origin = request.form.get("country_origin")
         password = request.form.get("password")
 
         date_of_birth = None
@@ -107,19 +110,21 @@ def user_signup():
             date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
 
         new_patient = Patient(
+            username=username,
             full_name=full_name,
             email=email,
             phone_number=phone_number,
             address=address,
             gender=gender,
             date_of_birth=date_of_birth,
+            country_origin=country_origin,
             password=generate_password_hash(password)  # Hash password securely
         )
         db.session.add(new_patient)
 
         # Create corresponding User record for authentication
         new_user = User(
-            username=email,  # Use email as username
+            username=username,  # Use username as username
             password=generate_password_hash(password),
             role='viewer'  # Assign role 'viewer' to patients
         )
@@ -134,8 +139,8 @@ if __name__ == "__main__":
         db.create_all()
 
         # If there’s no admin or viewer user yet, create them automatically
-        if not User.query.filter_by(username='Ian').first():
-            admin1 = User(username='Ian', password=generate_password_hash('Ian01'), role='admin')
+        if not User.query.filter_by(username='admin').first():
+            admin1 = User(username='admin', password=generate_password_hash('admin01'), role='admin')
             db.session.add_all([admin1])
             db.session.commit()
 
