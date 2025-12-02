@@ -37,7 +37,7 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/user/login", methods=["GET", "POST"])
+@app.route("/user_login", methods=["GET", "POST"])
 def user_login():
     if request.method == "POST":
         # Handle user login logic here
@@ -46,6 +46,16 @@ def user_login():
         # For now, just redirect to home (implement authentication later)
         return redirect(url_for("home"))
     return render_template("user_login.html")
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        # Handle user login logic here
+        username = request.form.get("username")
+        password = request.form.get("password")
+        # For now, just redirect to home (implement authentication later)
+        return redirect(url_for("home"))
+    return render_template("admin_login.html")
  
 @app.route('/login', methods=['GET', 'POST'])
 def login():
