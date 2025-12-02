@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, session, request, f
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from form import LoginForm, AdminLog
-from models import db, User
+from models import db, User, patient
 
 app = Flask(__name__)
 
@@ -16,18 +16,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-class Patient(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    phone_number = db.Column(db.String(20), nullable=False)
-    address = db.Column(db.Text, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    date_of_birth = db.Column(db.Date, nullable=True)
-    password = db.Column(db.String(200), nullable=False)  # In production, hash passwords!
 
-    def __repr__(self):
-        return f'<Patient {self.full_name}>'
 
 @app.route("/")
 def home():
@@ -95,7 +84,6 @@ def admin_login():
 
     return render_template("admin_login.html", form=form)
 
-from models import db, User, AllLog
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
@@ -103,7 +91,7 @@ def admin_dashboard():
         flash('Access denied.', 'danger')
         return redirect(url_for('admin_login'))
 
-    logs = AllLog.query.all()
+    logs = patient.query.all()
     return render_template('admin_dashboard.html', logs=logs)
 
 
