@@ -38,6 +38,35 @@ def about():
 
 
 
+
+
+
+
+
+
+@app.route('/user/login', methods=['GET', 'POST'])
+def user_login():
+    if request.method == "POST":
+        user = Patient.query.filter_by(username=Patient.username.data).first()
+        if user and check_password_hash(Patient.password, Patient.password.data):
+            session['user'] = Patient.username
+            session['pass'] = Patient.password
+            flash('Login successful!', 'success') 
+             
+            if session['pass'] == 'viewer':
+                return redirect(url_for('user_login'))
+            elif session['role'] == 'admin':
+                return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid credentials', 'danger')
+
+    return render_template("user_login.html")
+
+
+
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()  
@@ -50,8 +79,7 @@ def login():
             session['user'] = user.username
             session['role'] = user.role
             flash('Login successful!', 'success') 
-            
-            
+             
             if session['role'] == 'viewer':
                 return redirect(url_for('user_login'))
             elif session['role'] == 'admin':
@@ -59,8 +87,20 @@ def login():
         else:
             flash('Invalid credentials', 'danger')
     
-    
-    return render_template('login.html', form=form, title='Login')
+    return render_template('user_login.html', form=form, title='Login')
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route("/admin_login", methods=["GET", "POST"])
@@ -78,7 +118,7 @@ def admin_dashboard():
     logs = Patient.query.all()
     return render_template('admin_dashboard.html', logs=logs)
 
-admin_dashboard
+
 
 
 from werkzeug.security import generate_password_hash
@@ -136,3 +176,9 @@ if __name__ == "__main__":
             db.session.commit()
 
     app.run(debug=True)
+
+"""# Handle user login logic here
+        username = request.form.get("username")
+        password = request.form.get("password")
+        # For now, just redirect to home (implement authentication later)
+        return redirect(url_for("admin_dashboard"))"""
