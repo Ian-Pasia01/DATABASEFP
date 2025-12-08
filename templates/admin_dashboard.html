@@ -1,37 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <title>Admin Dashboard</title>
-</head>
-<body>
-    <h1>Welcome to the Admin Dashboard</h1>
-    <p>You have successfully logged in as an admin.</p>
+{% extends "base.html" %}
 
-    <h2>All Log Records</h2>
-    {% if logs %}
-        <table border="1" cellpadding="5" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Role</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in logs %}
-                <tr>
-                    <td>{{ log.id }}</td>
-                    <td>{{ log.username }}</td>
-                    <td>{{ log.role }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No log records found.</p>
-    {% endif %}
+{% block title %}Admin Dashboard - CarePoint{% endblock %}
 
-    <p><a href="{{ url_for('home') }}">Go to Home</a></p>
-</body>
-</html>
+{% block content %}
+<section id="admin-dashboard">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome to the admin dashboard. Here you can manage patients and other administrative tasks.</p>
+
+    <h2>Patients</h2>
+    <table class="table-container">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.id }}</td>
+                <td>{{ patient.full_name }}</td>
+                <td>{{ patient.email }}</td>
+                <td>{{ patient.phone_number }}</td>
+                <td>
+                    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="edit-btn">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('home') }}">Go to Home</a>
+</section>
+{% endblock %}

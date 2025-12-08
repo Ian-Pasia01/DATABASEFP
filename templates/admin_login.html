@@ -1,17 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - CarePoint{% endblock %}
+
+{% block content %}
 <section id="admin-login">
     <h1>Admin Login</h1>
     <p>Please enter your admin credentials to access the system.</p>
 
     <form method="POST">
         {{ form.csrf_token }}
-        {{ form.AdminUser.label }}
-        {{ form.AdminUser() }}
-    <br>
-        {{ form.passw.label }}
-        {{ form.passw() }}
-    <br>
+        <div>
+            {{ form.AdminUser.label }}
+            {{ form.AdminUser() }}
+        </div>
+        <div>
+            {{ form.passw.label }}
+            {{ form.passw() }}
+        </div>
         {{ form.submit() }}
     </form>
 
-    <p><a href="{{ url_for('user_login') }}">User Login</a></p>
+    <a href="{{ url_for('user_login') }}">User Login</a>
 </section>
+{% endblock %}
