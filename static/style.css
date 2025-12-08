@@ -321,6 +321,173 @@ footer {
     margin-top: 40px;
 }
 
+/* Services Page Styles */
+#services-hero {
+    background: linear-gradient(135deg, #007bff, #28a745);
+    color: white;
+    text-align: center;
+    padding: 100px 20px;
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+#services-hero h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#services-hero p {
+    font-size: 18px;
+    margin-bottom: 0;
+}
+
+#consultations {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+#consultations h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+#consultations p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+#consultations ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+#consultations li {
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+#laboratories {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+#laboratories h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+#laboratories p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.lab-services {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.service-item {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1;
+    min-width: 250px;
+}
+
+.service-item h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.service-item p {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+#doctors {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+#doctors h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+#doctors p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.doctor-specialties {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.specialty {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1;
+    min-width: 250px;
+}
+
+.specialty h3 {
+    color: #007bff;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.specialty p {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+#contact-services {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+#contact-services p {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+#contact-services button {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+#contact-services button:hover {
+    background-color: #0056b3;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     header div {
@@ -349,4 +516,207 @@ footer {
         flex-direction: column;
         align-items: center;
     }
+
+    #services-hero h1 {
+        font-size: 36px;
+    }
+
+    .lab-services, .doctor-specialties {
+        flex-direction: column;
+    }
+
+    .service-item, .specialty {
+        min-width: auto;
+    }
 }
+/* ===========================================================
+   SERVICES PAGE – PROFESSIONAL + AESTHETIC DESIGN
+=========================================================== */
+
+/* Global clean font & smooth transitions */
+body {
+    font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+    background: #f6f9fc;
+    margin: 0;
+    padding: 0;
+    color: #2b2b2b;
+    line-height: 1.7;
+}
+
+h1, h2, h3 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* =============================
+   HERO SECTION
+============================= */
+#services-hero {
+    background: linear-gradient(135deg, #0072ce, #00a875);
+    padding: 110px 20px;
+    text-align: center;
+    color: #fff;
+    border-radius: 20px;
+    margin: 40px auto;
+    max-width: 1200px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.14);
+    animation: fadeIn 1s ease-in-out;
+}
+
+#services-hero h1 {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+#services-hero p {
+    font-size: 20px;
+    opacity: 0.9;
+}
+
+/* =============================
+   SECTION WRAPPERS
+============================= */
+#consultations, 
+#laboratories, 
+#doctors, 
+#contact-services {
+    background: #ffffff;
+    padding: 45px;
+    margin: 40px auto;
+    border-radius: 20px;
+    max-width: 1200px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+    animation: slideUp 0.8s ease;
+}
+
+#consultations h2,
+#laboratories h2,
+#doctors h2 {
+    color: #0072ce;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+/* =============================
+   LISTS
+============================= */
+#consultations ul {
+    margin-top: 15px;
+    padding-left: 25px;
+}
+
+#consultations li {
+    margin-bottom: 10px;
+    font-size: 17px;
+}
+
+/* =============================
+   CARDS – Laboratory & Doctors
+============================= */
+.lab-services,
+.doctor-specialties {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.service-item,
+.specialty {
+    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: 0.3s;
+    border: 1px solid #eef2f6;
+}
+
+.service-item:hover,
+.specialty:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+}
+
+.service-item h3,
+.specialty h3 {
+    color: #0072ce;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.service-item p,
+.specialty p {
+    color: #555;
+    font-size: 16px;
+}
+
+/* =============================
+   CONTACT BOX
+============================= */
+#contact-services {
+    text-align: center;
+}
+
+#contact-services p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+#contact-services button {
+    background: #0072ce;
+    color: #fff;
+    padding: 14px 35px;
+    font-size: 17px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+#contact-services button:hover {
+    background: #005fa8;
+    transform: scale(1.05);
+}
+
+/* =============================
+   ANIMATIONS
+============================= */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes slideUp {
+    from {opacity: 0; transform: translateY(25px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* =============================
+   RESPONSIVE
+============================= */
+@media (max-width: 768px) {
+    #services-hero h1 {
+        font-size: 36px;
+    }
+
+    #services-hero p {
+        font-size: 16px;
+    }
+
+    #consultations,
+    #laboratories,
+    #doctors,
+    #contact-services {
+        padding: 30px;
+        border-radius: 16px;
+    }
+}
+@media (max-width: 480px) {
+    .lab-services,
+    .doctor-specialties {
+        grid-template-columns: 1fr;
+    }
+    #contact-services button {
+        width: 100%;
+    }
+}
+
