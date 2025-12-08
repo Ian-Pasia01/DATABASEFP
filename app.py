@@ -36,6 +36,10 @@ def about():
 def services():
     return render_template("services.html")
 
+@app.route("/announcement")
+def announcement():
+    return render_template("announcement.html")
+
 @app.route('/logout')
 def logout():
     session.clear()

@@ -342,6 +342,33 @@ footer {
     margin-bottom: 0;
 }
 
+
+#announcement-hero {
+    background: linear-gradient(135deg, #007bff, #28a745);
+    color: white;
+    text-align: center;
+    padding: 100px 20px;
+    border-radius: 10px;
+    margin-bottom: 40px;
+}
+
+#announcement {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+#card{
+    background-color: red;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+
 #consultations {
     background-color: white;
     padding: 40px;
