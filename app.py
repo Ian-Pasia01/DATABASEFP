@@ -18,7 +18,9 @@ def patient_dashboard():
     if session.get('role') not in ['viewer', 'patient']:
         flash('Access denied.', 'danger')
         return redirect(url_for('login'))
-    return render_template('patient_dashboard.html')
+    # Fetch patient data
+    patient = Patient.query.filter_by(username=session.get('user')).first()
+    return render_template('patient_dashboard_home.html', patient=patient)
 
 # Create all tables
 with app.app_context():
@@ -39,6 +41,22 @@ def services():
 @app.route("/announcement")
 def announcement():
     return render_template("announcement.html")
+
+@app.route("/patient_dashboard_home")
+def patient_dashboard_home():
+    return render_template("patient_dashboard_home.html")
+
+@app.route("/patient_dashboard_services")
+def patient_dashboard_services():
+    return render_template("patient_dashboard_services.html")
+
+@app.route("/patient_dashboard_about")
+def patient_dashboard_about():
+    return render_template("patient_dashboard_about.html")
+
+@app.route("/patient_dashboard_announce")
+def patient_dashboard_announce():
+    return render_template("patient_dashboard_announce.html")
 
 @app.route('/logout')
 def logout():
@@ -133,12 +151,19 @@ def user_signup():
         address = request.form.get("address")
         gender = request.form.get("gender")
         date_of_birth_str = request.form.get("date_of_birth")
+        blood_type = request.form.get("blood_type")
+        height = request.form.get("height")
+        age_str = request.form.get("age")
         country_origin = request.form.get("country_origin")
         password = request.form.get("password")
 
         date_of_birth = None
         if date_of_birth_str:
             date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
+
+        age = None
+        if age_str:
+            age = int(age_str)
 
         new_patient = Patient(
             username=username,
@@ -148,6 +173,9 @@ def user_signup():
             address=address,
             gender=gender,
             date_of_birth=date_of_birth,
+            blood_type=blood_type,
+            height=height,
+            age=age,
             country_origin=country_origin,
             password=generate_password_hash(password)  # Hash password securely
         )

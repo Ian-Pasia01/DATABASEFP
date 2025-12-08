@@ -20,6 +20,10 @@ class Patient(db.Model):
     date_of_birth = db.Column(db.Date, nullable=True)
     country_origin = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(200), nullable=False)  # Password should be hashed for security
+    blood_type = db.Column(db.String(10), nullable=True)
+    height = db.Column(db.String(20), nullable=True)  # e.g., "5'10\""
+    age = db.Column(db.Integer, nullable=True)
+    picture = db.Column(db.String(200), nullable=True)  # Path to image
 
     def __repr__(self):
         return f'<Patient {self.full_name}>'
