@@ -38,20 +38,9 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('home'))
 
-
 @app.route('/user/login', methods=['GET', 'POST'])
 def user_login():
     if request.method == "POST":
-<<<<<<< HEAD
-        user = Patient.query.filter_by(username=Patient.username.data).first()
-        if user and check_password_hash(Patient.password, Patient.password.data):
-            session['user'] = Patient.username
-            session['pass'] = Patient.password
-            flash('Login successful!', 'success')
-
-            if session['pass'] == 'viewer':
-                return redirect(url_for('user_login'))
-=======
         username = request.form.get("username")
         password = request.form.get("password")
 
@@ -64,15 +53,12 @@ def user_login():
 
             if session['role'] == 'viewer':
                 return redirect(url_for('patient_dashboard'))
->>>>>>> 571566105086fdd7adb0f6fcba51ee5eea5724f1
             elif session['role'] == 'admin':
                 return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid credentials', 'danger')
 
     return render_template("user_login.html")
-
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -84,7 +70,7 @@ def login():
         admin = Admin.query.filter_by(username=form.username.data).first()
         if admin and check_password_hash(admin.password, form.password.data):
             session['user'] = admin.username
-            session['role'] = admin.role
+            session['role'] = 'admin'
             flash('Login successful!', 'success')
             return redirect(url_for('admin_dashboard'))
 
@@ -103,9 +89,6 @@ def login():
             flash('Invalid credentials', 'danger')
 
     return render_template('user_login.html', form=form, title='Login')
-
-
-
 
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
@@ -129,8 +112,6 @@ def admin_dashboard():
     # Example: show all patients in dashboard
     patients = Patient.query.all()
     return render_template('admin_dashboard.html', patients=patients)
-
-
 
 from werkzeug.security import generate_password_hash
 
