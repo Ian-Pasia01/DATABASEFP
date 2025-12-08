@@ -20,14 +20,16 @@ class Patient(db.Model):
     date_of_birth = db.Column(db.Date, nullable=True)
     country_origin = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(200), nullable=False)  # Password should be hashed for security
+    blood_type = db.Column(db.String(10), nullable=True)
+    height = db.Column(db.String(20), nullable=True)  # e.g., "5'10\""
+    age = db.Column(db.Integer, nullable=True)
+    picture = db.Column(db.String(200), nullable=True)  # Path to image
 
     def __repr__(self):
         return f'<Patient {self.full_name}>'
 
+
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
+    username = db.Column(db.String(125), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='admin')
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp())

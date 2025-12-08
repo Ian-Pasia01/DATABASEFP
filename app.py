@@ -16,9 +16,25 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+<<<<<<< HEAD
 # -----------------------
 # HOME ROUTES
 # -----------------------
+=======
+@app.route('/patient_dashboard')
+def patient_dashboard():
+    if session.get('role') not in ['viewer', 'patient']:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('login'))
+    # Fetch patient data
+    patient = Patient.query.filter_by(username=session.get('user')).first()
+    return render_template('patient_dashboard_home.html', patient=patient)
+
+# Create all tables
+with app.app_context():
+    db.create_all()
+
+>>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -31,10 +47,91 @@ def about():
 def services():
     return render_template("services.html")
 
+<<<<<<< HEAD
 
 # -----------------------
 # ADMIN LOGIN
 # -----------------------
+=======
+@app.route("/announcement")
+def announcement():
+    return render_template("announcement.html")
+
+@app.route("/patient_dashboard_home")
+def patient_dashboard_home():
+    return render_template("patient_dashboard_home.html")
+
+@app.route("/patient_dashboard_services")
+def patient_dashboard_services():
+    return render_template("patient_dashboard_services.html")
+
+@app.route("/patient_dashboard_about")
+def patient_dashboard_about():
+    return render_template("patient_dashboard_about.html")
+
+@app.route("/patient_dashboard_announce")
+def patient_dashboard_announce():
+    return render_template("patient_dashboard_announce.html")
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('home'))
+
+@app.route('/user/login', methods=['GET', 'POST'])
+def user_login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = Patient.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+            session['user'] = user.username
+            session['role'] = 'viewer'  # or user.role if you store roles in Patient
+            flash('Login successful!', 'success')
+
+            if session['role'] == 'viewer':
+                return redirect(url_for('patient_dashboard'))
+            elif session['role'] == 'admin':
+                return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid credentials', 'danger')
+
+    return render_template("user_login.html")
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+
+    if form.validate_on_submit():
+
+        # Check if it's an admin login
+        admin = Admin.query.filter_by(username=form.username.data).first()
+        if admin and check_password_hash(admin.password, form.password.data):
+            session['user'] = admin.username
+            session['role'] = 'admin'
+            flash('Login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
+
+        # Check if it's a regular user login
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and check_password_hash(user.password, form.password.data):
+            session['user'] = user.username
+            session['role'] = user.role
+            flash('Login successful!', 'success')
+
+            if session['role'] == 'viewer':
+                return redirect(url_for('home'))
+            elif session['role'] == 'admin':
+                return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid credentials', 'danger')
+
+    return render_template('user_login.html', form=form, title='Login')
+
+>>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
     form = AdminLog()
@@ -66,8 +163,12 @@ def admin_dashboard():
     patients = Patient.query.all()
     return render_template("admin_dashboard.html", patients=patients)
 
+<<<<<<< HEAD
 
 
+=======
+from werkzeug.security import generate_password_hash
+>>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
 
 
 # -----------------------
@@ -116,6 +217,9 @@ def user_signup():
         address = request.form.get("address")
         gender = request.form.get("gender")
         date_of_birth_str = request.form.get("date_of_birth")
+        blood_type = request.form.get("blood_type")
+        height = request.form.get("height")
+        age_str = request.form.get("age")
         country_origin = request.form.get("country_origin")
         password = request.form.get("password")
 
@@ -123,7 +227,14 @@ def user_signup():
         if date_of_birth_str:
             date_of_birth = datetime.strptime(date_of_birth_str, "%Y-%m-%d").date()
 
+<<<<<<< HEAD
         # Add patient
+=======
+        age = None
+        if age_str:
+            age = int(age_str)
+
+>>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
         new_patient = Patient(
             username=username,
             full_name=full_name,
@@ -132,6 +243,9 @@ def user_signup():
             address=address,
             gender=gender,
             date_of_birth=date_of_birth,
+            blood_type=blood_type,
+            height=height,
+            age=age,
             country_origin=country_origin,
             password=generate_password_hash(password)
         )
@@ -217,4 +331,13 @@ if __name__ == "__main__":
             db.session.commit()
 
     app.run(debug=True)
+<<<<<<< HEAD
     
+=======
+
+"""# Handle user login logic here
+        username = request.form.get("username")
+        password = request.form.get("password")
+        # For now, just redirect to home (implement authentication later)
+        return redirect(url_for("admin_dashboard"))"""
+>>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Announcement - Carepoint{% endblock %}
+{% block content %}
+<section id="announcement-hero">
+    <h1>Announcements</h1>
+    <p>Stay updated with the latest news and updates from CarePoint.</p>
+</section>
+
+<section id="announcement">
+    <h2 style="text-align: center;">Recent Announcements</h2>
+    <div class="scroll-wrapper">
+        <button class="scroll-btn left-btn" id="left-btn"><</button>
+        <div class="horizontal-scroll-container" id="scroll-container">
+            <div class="card">
+                <h3>New Telemedicine Services</h3>
+                <p>We are excited to announce the launch of our new telemedicine services. Consult with our doctors remotely for your convenience.</p>
+                <p><strong>Date:</strong> October 15, 2023</p>
+            </div>
+            <div class="card">
+                <h3>Health Checkup Camp</h3>
+                <p>Join our free health checkup camp this weekend. Comprehensive checkups including blood tests and consultations.</p>
+                <p><strong>Date:</strong> October 20, 2023</p>
+            </div>
+            <div class="card">
+                <h3>Vaccination Drive</h3>
+                <p>Annual flu vaccination drive starting next week. Protect yourself and your family from seasonal illnesses.</p>
+                <p><strong>Date:</strong> October 25, 2023</p>
+            </div>
+            <div class="card">
+                <h3>New Doctor Onboard</h3>
+                <p>Welcome Dr. Emily Johnson, our new pediatric specialist. She brings over 10 years of experience in child healthcare.</p>
+                <p><strong>Date:</strong> November 1, 2023</p>
+            </div>
+            <div class="card">
+                <h3>Appointment Booking Update</h3>
+                <p>Our online appointment booking system is now live. Book your slots easily through our website or app.</p>
+                <p><strong>Date:</strong> November 5, 2023</p>
+            </div>
+        </div>
+        <button class="scroll-btn right-btn" id="right-btn">></button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('scroll-container');
+            const leftBtn = document.getElementById('left-btn');
+            const rightBtn = document.getElementById('right-btn');
+            const cardWidth = 910; 
+
+            leftBtn.addEventListener('click', function() {
+                container.scrollBy({
+                    left: -cardWidth,
+                    behavior: 'smooth'
+                });
+            });
+
+            rightBtn.addEventListener('click', function() {
+                container.scrollBy({
+                    left: cardWidth,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</section>
+<section id="contact-announcement">
+    <p>For more information or questions about the announcements, please contact us.</p>
+    <button type="button">Contact Us</button>
+</section>
+
+{% endblock %}
+

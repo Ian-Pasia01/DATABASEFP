@@ -1,0 +1,28 @@
+{% extends "patient_dashboard.html" %}
+
+{% block title %}Patient Dashboard Home{% endblock %}
+
+{% block content %}
+<section id="profile">
+    <h1>Patient Profile</h1>
+    <div class="profile-info">
+        <img src="{{ patient.picture or '/static/default-profile.png' }}" alt="Profile Picture" class="profile-pic">
+        <div class="details">
+            <p><strong>Name:</strong> {{ patient.full_name }}</p>
+            <p><strong>Blood Type:</strong> {{ patient.blood_type or 'Not specified' }}</p>
+            <p><strong>Height:</strong> {{ patient.height or 'Not specified' }}</p>
+            <p><strong>Age:</strong> {{ patient.age or 'Not specified' }}</p>
+        </div>
+    </div>
+</section>
+
+<section id="appointments">
+    <h2>Appointments</h2>
+    <p>Here you can view and manage your appointments.</p>
+    <!-- Placeholder for appointment list or form -->
+    <ul>
+        <li>No upcoming appointments.</li>
+    </ul>
+    <button>Schedule New Appointment</button>
+</section>
+{% endblock %}
