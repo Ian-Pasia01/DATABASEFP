@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Add Staff - CarePoint{% endblock %}
+
+{% block content %}
+
+<div class="admin-container">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+    <h2>CarePoint Admin</h2>
+    <ul>
+        <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="{{ url_for('view_patients') }}"><i class="fas fa-user-injured"></i> Patients</a></li>
+        <li><a href="{{ url_for('view_appointments') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+        <li><a href="{{ url_for('view_staff') }}"><i class="fas fa-user-md"></i> Staff</a></li>
+        <li><a href="#"><i class="fas fa-chart-line"></i> Reports</a></li>
+        <li><a href="#"><i class="fas fa-cogs"></i> Settings</a></li>
+    </ul>
+</aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="dashboard-content">
+
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>Add New Staff</h1>
+            <div class="admin-info">Administrator</div>
+        </header>
+
+        <form method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email"><br>
+
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone"><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="doctor">Doctor</option>
+                <option value="nurse">Nurse</option>
+                <option value="admin">Admin</option>
+            </select><br>
+
+            <button type="submit" class="btn">Add Staff</button>
+        </form>
+
+        <a href="{{ url_for('view_staff') }}" class="home-link">Back to Staff List</a>
+
+    </main>
+
+</div>
+
+{% endblock %}

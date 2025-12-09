@@ -3,8 +3,9 @@ from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, session, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import db, User, Patient, Admin
-from form import LoginForm, AdminLog
+from models import db, User, Patient, Admin, Staff, Appointment
+from form import LoginForm, AdminLog, StaffLoginForm
+
 
 # -----------------------
 # Flask App Configuration
@@ -16,25 +17,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-<<<<<<< HEAD
 # -----------------------
 # HOME ROUTES
 # -----------------------
-=======
-@app.route('/patient_dashboard')
-def patient_dashboard():
-    if session.get('role') not in ['viewer', 'patient']:
-        flash('Access denied.', 'danger')
-        return redirect(url_for('login'))
-    # Fetch patient data
-    patient = Patient.query.filter_by(username=session.get('user')).first()
-    return render_template('patient_dashboard_home.html', patient=patient)
-
-# Create all tables
-with app.app_context():
-    db.create_all()
-
->>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -47,97 +32,19 @@ def about():
 def services():
     return render_template("services.html")
 
-<<<<<<< HEAD
-
-# -----------------------
-# ADMIN LOGIN
-# -----------------------
-=======
 @app.route("/announcement")
 def announcement():
     return render_template("announcement.html")
 
-@app.route("/patient_dashboard_home")
-def patient_dashboard_home():
-    return render_template("patient_dashboard_home.html")
-
-@app.route("/patient_dashboard_services")
-def patient_dashboard_services():
-    return render_template("patient_dashboard_services.html")
-
-@app.route("/patient_dashboard_about")
-def patient_dashboard_about():
-    return render_template("patient_dashboard_about.html")
-
-@app.route("/patient_dashboard_announce")
-def patient_dashboard_announce():
-    return render_template("patient_dashboard_announce.html")
-
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('You have been logged out.', 'info')
-    return redirect(url_for('home'))
-
-@app.route('/user/login', methods=['GET', 'POST'])
-def user_login():
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-
-        user = Patient.query.filter_by(username=username).first()
-
-        if user and check_password_hash(user.password, password):
-            session['user'] = user.username
-            session['role'] = 'viewer'  # or user.role if you store roles in Patient
-            flash('Login successful!', 'success')
-
-            if session['role'] == 'viewer':
-                return redirect(url_for('patient_dashboard'))
-            elif session['role'] == 'admin':
-                return redirect(url_for('admin_dashboard'))
-        else:
-            flash('Invalid credentials', 'danger')
-
-    return render_template("user_login.html")
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-
-    if form.validate_on_submit():
-
-        # Check if it's an admin login
-        admin = Admin.query.filter_by(username=form.username.data).first()
-        if admin and check_password_hash(admin.password, form.password.data):
-            session['user'] = admin.username
-            session['role'] = 'admin'
-            flash('Login successful!', 'success')
-            return redirect(url_for('admin_dashboard'))
-
-        # Check if it's a regular user login
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and check_password_hash(user.password, form.password.data):
-            session['user'] = user.username
-            session['role'] = user.role
-            flash('Login successful!', 'success')
-
-            if session['role'] == 'viewer':
-                return redirect(url_for('home'))
-            elif session['role'] == 'admin':
-                return redirect(url_for('admin_dashboard'))
-        else:
-            flash('Invalid credentials', 'danger')
-
-    return render_template('user_login.html', form=form, title='Login')
-
->>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
+# -----------------------
+# ADMIN LOGIN
+# -----------------------
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
     form = AdminLog()
 
     if form.validate_on_submit():
-        admin = Admin.query.filter_by(username=form.AdminUser.data).first()
+        admin = User.query.filter_by(username=form.AdminUser.data, role='admin').first()
 
         if admin and check_password_hash(admin.password, form.passw.data):
             session['user'] = admin.username
@@ -150,7 +57,6 @@ def admin_login():
 
     return render_template("admin_login.html", form=form)
 
-
 # -----------------------
 # ADMIN DASHBOARD
 # -----------------------
@@ -161,14 +67,22 @@ def admin_dashboard():
         return redirect(url_for("admin_login"))
 
     patients = Patient.query.all()
-    return render_template("admin_dashboard.html", patients=patients)
+    appointments = Appointment.query.all()  # <-- fetch all appointments
+    staff = Staff.query.all()
+    return render_template("admin_dashboard.html", patients=patients, appointments=appointments, staff=staff)
 
-<<<<<<< HEAD
 
+# -----------------------
+# VIEW PATIENTS
+# -----------------------
+@app.route("/admin/view_patients")
+def view_patients():
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
 
-=======
-from werkzeug.security import generate_password_hash
->>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
+    patients = Patient.query.all()
+    return render_template("view_patients.html", patients=patients)
 
 
 # -----------------------
@@ -193,6 +107,13 @@ def edit_patient(patient_id):
         if dob:
             patient.date_of_birth = datetime.strptime(dob, "%Y-%m-%d").date()
 
+        patient.blood_type = request.form.get("blood_type")
+        height = request.form.get("height")
+        if height:
+            patient.height = float(height)
+        age = request.form.get("age")
+        if age:
+            patient.age = int(age)
         patient.country_origin = request.form.get("country_origin")
 
         db.session.commit()
@@ -202,6 +123,85 @@ def edit_patient(patient_id):
 
     return render_template("edit_patient.html", patient=patient)
 
+
+# View all appointments
+@app.route("/admin/appointments")
+def view_appointments():
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    appointments = Appointment.query.all()
+    return render_template("appointments.html", appointments=appointments)
+
+# Add appointment
+@app.route("/admin/appointments/add", methods=["GET", "POST"])
+def add_appointment():
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    if request.method == "POST":
+        patient_id = request.form.get("patient_id")
+        staff_id = request.form.get("staff_id")
+        doctor_name = request.form.get("doctor_name")
+        date = request.form.get("date")
+        time = request.form.get("time")
+
+        appointment = Appointment(
+            patient_id=patient_id,
+            staff_id=staff_id,
+            doctor_name=doctor_name,
+            date=datetime.strptime(date, "%Y-%m-%d").date(),
+            time=time
+        )
+        db.session.add(appointment)
+        db.session.commit()
+
+        flash("Appointment created!", "success")
+        return redirect(url_for("view_appointments"))
+
+    patients = Patient.query.all()
+    staff = Staff.query.all()
+    return render_template("add_appointment.html", patients=patients, staff=staff)
+
+# Edit appointment
+@app.route("/admin/appointments/edit/<int:appointment_id>", methods=["GET", "POST"])
+def edit_appointment(appointment_id):
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+
+    if request.method == "POST":
+        appointment.patient_id = request.form.get("patient_id")
+        appointment.staff_id = request.form.get("staff_id")
+        appointment.doctor_name = request.form.get("doctor_name")
+        appointment.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
+        appointment.time = request.form.get("time")
+        appointment.status = request.form.get("status")
+
+        db.session.commit()
+        flash("Appointment updated!", "success")
+        return redirect(url_for("view_appointments"))
+
+    patients = Patient.query.all()
+    staff = Staff.query.all()
+    return render_template("edit_appointment.html", appointment=appointment, patients=patients, staff=staff)
+
+# Delete appointment
+@app.route("/admin/appointments/delete/<int:appointment_id>")
+def delete_appointment(appointment_id):
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    appointment = Appointment.query.get_or_404(appointment_id)
+    db.session.delete(appointment)
+    db.session.commit()
+    flash("Appointment deleted!", "success")
+    return redirect(url_for("view_appointments"))
 
 # -----------------------
 # USER SIGNUP
@@ -223,18 +223,25 @@ def user_signup():
         country_origin = request.form.get("country_origin")
         password = request.form.get("password")
 
+        # Validate unique username and email
+        existing_patient_username = Patient.query.filter_by(username=username).first()
+        if existing_patient_username:
+            flash("Username already exists. Please choose a different one.", "danger")
+            return redirect(url_for("user_signup"))
+
+        existing_patient_email = Patient.query.filter_by(email=email).first()
+        if existing_patient_email:
+            flash("Email already exists. Please use a different email.", "danger")
+            return redirect(url_for("user_signup"))
+
         date_of_birth = None
         if date_of_birth_str:
             date_of_birth = datetime.strptime(date_of_birth_str, "%Y-%m-%d").date()
 
-<<<<<<< HEAD
-        # Add patient
-=======
         age = None
         if age_str:
             age = int(age_str)
 
->>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
         new_patient = Patient(
             username=username,
             full_name=full_name,
@@ -251,20 +258,16 @@ def user_signup():
         )
         db.session.add(new_patient)
 
-        # Create login credentials
-        new_user = User(
-            username=username,
-            password=generate_password_hash(password),
-            role="viewer"
-        )
-        db.session.add(new_user)
-
-        db.session.commit()
-        flash("Account created successfully!", "success")
-        return redirect(url_for("home"))
+        try:
+            db.session.commit()
+            flash("Account created successfully!", "success")
+            return redirect(url_for("home"))
+        except Exception as e:
+            db.session.rollback()
+            flash("An error occurred during signup. Please try again.", "danger")
+            return redirect(url_for("user_signup"))
 
     return render_template("user_signup.html")
-
 
 # -----------------------
 # USER LOGIN (VIEWER)
@@ -275,22 +278,25 @@ def user_login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        user = User.query.filter_by(username=username).first()
+        # Check admin first
+        admin = User.query.filter_by(username=username, role='admin').first()
+        if admin and check_password_hash(admin.password, password):
+            session["user"] = admin.username
+            session["role"] = "admin"
+            flash("Admin login successful!", "success")
+            return redirect(url_for("admin_dashboard"))
 
-        if user and check_password_hash(user.password, password):
-            session["user"] = user.username
-            session["role"] = user.role
-
+        # Check patient
+        patient = Patient.query.filter_by(username=username).first()
+        if patient and check_password_hash(patient.password, password):
+            session["user"] = patient.username
+            session["role"] = "viewer"
             flash("Login successful!", "success")
-            if user.role == "viewer":
-                return redirect(url_for("patient_dashboard"))
-            else:
-                return redirect(url_for("admin_dashboard"))
+            return redirect(url_for("patient_dashboard"))
 
         flash("Invalid credentials", "danger")
 
     return render_template("user_login.html")
-
 
 # -----------------------
 # PATIENT DASHBOARD
@@ -300,8 +306,30 @@ def patient_dashboard():
     if session.get("role") not in ["viewer", "patient"]:
         flash("Access denied.", "danger")
         return redirect(url_for("user_login"))
-    return render_template("patient_dashboard.html")
+    username = session.get("user")
+    patient = Patient.query.filter_by(username=username).first()
+    return render_template("patient_dashboard_home.html", patient=patient)
 
+@app.route("/patient_dashboard/about")
+def patient_dashboard_about():
+    if session.get("role") not in ["viewer", "patient"]:
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    return render_template("patient_dashboard_about.html")
+
+@app.route("/patient_dashboard/services")
+def patient_dashboard_services():
+    if session.get("role") not in ["viewer", "patient"]:
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    return render_template("patient_dashboard_services.html")
+
+@app.route("/patient_dashboard/announce")
+def patient_dashboard_announce():
+    if session.get("role") not in ["viewer", "patient"]:
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    return render_template("patient_dashboard_announce.html")
 
 # -----------------------
 # LOGOUT
@@ -311,7 +339,6 @@ def logout():
     session.clear()
     flash("Logged out successfully.", "info")
     return redirect(url_for("home"))
-
 
 # -----------------------
 # STARTUP (DB CREATE)
@@ -330,14 +357,155 @@ if __name__ == "__main__":
             db.session.add(admin_user)
             db.session.commit()
 
-    app.run(debug=True)
-<<<<<<< HEAD
-    
-=======
 
-"""# Handle user login logic here
+#staff/doctors log in
+
+@app.route("/staff/login", methods=["GET", "POST"])
+def staff_login():
+    form = StaffLoginForm()
+
+    if form.validate_on_submit():
+        staff = Staff.query.filter_by(username=form.username.data).first()
+
+        if staff and check_password_hash(staff.password, form.password.data):
+            session["role"] = "staff"
+            session["staff_id"] = staff.id
+            flash("Login successful!", "success")
+            return redirect(url_for("staff_dashboard_view"))
+
+        flash("Invalid username or password", "danger")
+
+    return render_template("staff_login.html", form=form)
+
+@app.route("/staff/dashboard")
+def staff_dashboard_view():
+    if session.get("role") != "staff":
+        flash("Access denied.", "danger")
+        return redirect(url_for("staff_login"))
+
+    staff_id = session.get("staff_id")
+    staff = Staff.query.get(staff_id)
+    appointments = Appointment.query.filter_by(staff_id=staff_id).all()
+
+    return render_template("staff_dashboard.html", staff=staff, appointments=appointments)
+
+@app.route("/staff/appointments/update/<int:appointment_id>", methods=["POST"])
+def update_appointment_status(appointment_id):
+    if session.get("role") != "staff":
+        flash("Access denied.", "danger")
+        return redirect(url_for("staff_login"))
+
+    staff_id = session.get("staff_id")
+    appointment = Appointment.query.get_or_404(appointment_id)
+
+    # Only allow staff to update their own appointments
+    if appointment.staff_id != staff_id:
+        flash("You cannot update this appointment.", "danger")
+        return redirect(url_for("staff_dashboard_view"))
+
+    new_status = request.form.get("status")
+    if new_status in ["Pending", "In Progress", "Completed"]:
+        appointment.status = new_status
+        db.session.commit()
+        flash("Appointment status updated!", "success")
+    else:
+        flash("Invalid status.", "danger")
+
+    return redirect(url_for("staff_dashboard_view"))
+
+
+
+# -----------------------
+# STAFF MANAGEMENT ROUTES
+# -----------------------
+
+# View all staff
+@app.route("/admin/view_staff")
+def view_staff():
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    staff = Staff.query.all()
+    return render_template("view_staff.html", staff=staff)
+
+# Add staff
+@app.route("/admin/add_staff", methods=["GET", "POST"])
+def add_staff():
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    if request.method == "POST":
         username = request.form.get("username")
+        name = request.form.get("name")
         password = request.form.get("password")
-        # For now, just redirect to home (implement authentication later)
-        return redirect(url_for("admin_dashboard"))"""
->>>>>>> 0068ca7524889d93cef750f207ed4566d09b460c
+        role = request.form.get("role")
+
+        # Check if username exists
+        existing_staff = Staff.query.filter_by(username=username).first()
+        if existing_staff:
+            flash("Username already exists.", "danger")
+            return redirect(url_for("add_staff"))
+
+        new_staff = Staff(
+            username=username,
+            name=name,
+            password=generate_password_hash(password),
+            role=role
+        )
+        db.session.add(new_staff)
+        db.session.commit()
+
+        flash("Staff added successfully!", "success")
+        return redirect(url_for("view_staff"))
+
+    return render_template("add_staff.html")
+
+# Edit staff
+@app.route("/admin/edit_staff/<int:staff_id>", methods=["GET", "POST"])
+def edit_staff(staff_id):
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    staff_member = Staff.query.get_or_404(staff_id)
+
+    if request.method == "POST":
+        # Update fields from form
+        staff_member.username = request.form.get("username")
+        staff_member.name = request.form.get("name")
+        staff_member.email = request.form.get("email")  # optional
+        staff_member.phone = request.form.get("phone")  # optional
+        staff_member.role = request.form.get("role")
+
+        # Update password only if a new one is provided
+        password = request.form.get("password")
+        if password:
+            staff_member.password = generate_password_hash(password)
+
+        # Commit changes
+        db.session.commit()
+        flash("Staff updated successfully!", "success")
+        return redirect(url_for("view_staff"))
+
+    # Render template with staff_member object as 'member'
+    return render_template("edit_staff.html", member=staff_member)
+
+
+# Delete staff
+@app.route("/admin/delete_staff/<int:staff_id>")
+def delete_staff(staff_id):
+    if session.get("role") != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin_login"))
+
+    staff_member = Staff.query.get_or_404(staff_id)
+    db.session.delete(staff_member)
+    db.session.commit()
+
+    flash("Staff deleted successfully!", "success")
+    return redirect(url_for("view_staff"))
+
+if __name__ == "__main__":
+    app.run(debug=True)

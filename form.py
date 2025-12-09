@@ -25,3 +25,40 @@ class AdminLog(FlaskForm):
         validators=[DataRequired()]  # Cannot be empty
     )
     submit = SubmitField("Login")  # The button that says "Login"
+
+
+
+
+class AppointmentForm(FlaskForm):
+    patient_id = SelectField(
+        "Patient",
+        coerce=int,  # ensures patient_id is an integer
+        validators=[DataRequired()]
+    )
+    doctor_name = StringField(
+        "Doctor Name",
+        validators=[DataRequired()]
+    )
+    date = StringField(
+        "Date (YYYY-MM-DD)",
+        validators=[DataRequired()]
+    )
+    time = StringField(
+        "Time (HH:MM)",
+        validators=[DataRequired()]
+    )
+    submit = SubmitField("Book Appointment")
+
+class StaffLoginForm(FlaskForm):
+    username = StringField(
+        "Username",
+        validators=[DataRequired()]
+    )
+    password = PasswordField(
+        "Password",
+    )
+
+class StaffLoginForm(FlaskForm):
+    username = StringField("Username", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    submit = SubmitField("Login")

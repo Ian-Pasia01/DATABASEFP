@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Dashboard - CarePoint{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <aside class="sidebar">
+        <h2>Staff Panel</h2>
+        <ul>
+            <li><a href="{{ url_for('staff_dashboard_view') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </aside>
+    
+    <main class="dashboard-content">
+        <header>
+            <h1>Welcome, {{ staff.name }} ({{ staff.role | capitalize }})</h1>
+        </header>
+
+        <section>
+            <h2>Your Appointments</h2>
+            {% if appointments %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Update Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td>{{ appt.patient.full_name }}</td>
+                        <td>{{ appt.date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ appt.time }}</td>
+                        <td>{{ appt.status }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('update_appointment_status', appointment_id=appt.id) }}">
+                                <select name="status">
+                                    <option value="Pending" {% if appt.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="In Progress" {% if appt.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Completed" {% if appt.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                                <button type="submit" class="btn">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No appointments assigned.</p>
+            {% endif %}
+        </section>
+    </main>
+</div>
+{% endblock %}

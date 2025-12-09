@@ -3,6 +3,8 @@ from datetime import date
 
 db = SQLAlchemy()
 
+
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
@@ -10,26 +12,51 @@ class User(db.Model):
     role = db.Column(db.String(10), nullable=False)
 
 class Patient(db.Model):
+    __tablename__ = "patient"
+
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
     full_name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    phone_number = db.Column(db.String(20), nullable=False)
-    address = db.Column(db.Text, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
-    date_of_birth = db.Column(db.Date, nullable=True)
-    country_origin = db.Column(db.String(100), nullable=False)
-    password = db.Column(db.String(200), nullable=False)  # Password should be hashed for security
-    blood_type = db.Column(db.String(10), nullable=True)
-    height = db.Column(db.String(20), nullable=True)  # e.g., "5'10\""
-    age = db.Column(db.Integer, nullable=True)
-    picture = db.Column(db.String(200), nullable=True)  # Path to image
+    phone_number = db.Column(db.String(20))
+    address = db.Column(db.String(200))
+    gender = db.Column(db.String(10))
+    date_of_birth = db.Column(db.Date)
+    blood_type = db.Column(db.String(5))
+    height = db.Column(db.String(20))   # height as string
+    age = db.Column(db.Integer)
+    country_origin = db.Column(db.String(50))
+    password = db.Column(db.String(200), nullable=False)  # hashed password
+
+    appointments = db.relationship('Appointment', backref='patient', lazy=True)
 
     def __repr__(self):
-        return f'<Patient {self.full_name}>'
+        return f"<Patient {self.full_name}>"
 
 
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(125), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+
+class Staff(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    role = db.Column(db.String(20), default="staff")  # e.g., 'doctor', 'nurse', etc.
+
+    appointments = db.relationship('Appointment', backref='staff', lazy=True)
+
+    def __repr__(self):
+        return f"<Staff {self.name}>"
+
+class Appointment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=False)
+    doctor_name = db.Column(db.String(120), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.String(20), nullable=False)
+    status = db.Column(db.String(20), default="Pending")
+

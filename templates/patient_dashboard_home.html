@@ -6,7 +6,7 @@
 <section id="profile">
     <h1>Patient Profile</h1>
     <div class="profile-info">
-        <img src="{{ patient.picture or '/static/default-profile.png' }}" alt="Profile Picture" class="profile-pic">
+        <img src="{{ url_for('static', filename='pictures/patient-icon-design-vector.jpg') }}" alt="Profile Picture" class="profile-pic">
         <div class="details">
             <p><strong>Name:</strong> {{ patient.full_name }}</p>
             <p><strong>Blood Type:</strong> {{ patient.blood_type or 'Not specified' }}</p>
