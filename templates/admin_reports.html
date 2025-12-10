@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - CarePoint{% endblock %}
+
+{% block head %}
+<style>
+    /* Hide the main navigation header for admin reports */
+    header {
+        display: none !important;
+    }
+
+    /* Adjust main content to take full height */
+    main {
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
+    }
+</style>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-crown"></i> Admin Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('view_patients') }}"><i class="fas fa-user-injured"></i> Patients</a></li>
+                <li><a href="{{ url_for('view_appointments') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('view_staff') }}"><i class="fas fa-user-md"></i> Staff</a></li>
+                <li><a href="{{ url_for('admin_reports') }}" class="active"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main-content">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1 class="welcome-message">Reports & Analytics</h1>
+                <div class="admin-role-badge">Administrator</div>
+            </div>
+        </header>
+
+        <div class="dashboard-content-wrapper">
+            <!-- Stats Cards -->
+            <section class="reports-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar"></i> System Overview</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ patients | length }}</h3>
+                            <p>Total Patients</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ todays_appointments_count }}</h3>
+                            <p>Today's Appointments</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ staff | length }}</h3>
+                            <p>Total Staff</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ appointments | selectattr('status', 'equalto', 'Pending') | list | length }}</h3>
+                            <p>Pending Tasks</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}
+{% endblock %}

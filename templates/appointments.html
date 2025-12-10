@@ -2,32 +2,125 @@
 
 {% block title %}Appointments - CarePoint{% endblock %}
 
+{% block head %}
+<style>
+    /* Hide the main navigation header for admin pages */
+    header {
+        display: none !important;
+    }
+
+    /* Adjust main content to take full height */
+    main {
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Appointments</h1>
+<div class="appointments-container">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-crown"></i> Admin Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('view_patients') }}"><i class="fas fa-user-injured"></i> Patients</a></li>
+                <li><a href="{{ url_for('view_appointments') }}" class="active"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('view_staff') }}"><i class="fas fa-user-md"></i> Staff</a></li>
+                <li><a href="{{ url_for('admin_reports') }}"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                <li><a href="#"><i class="fas fa-cogs"></i> Settings</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
 
-<table class="table-container">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Patient</th>
-            <th>Doctor</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-        </tr>
-    </thead>
+    <!-- MAIN CONTENT -->
+    <main class="admin-main-content">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1 class="welcome-message">Appointments Management</h1>
+                <div class="admin-role-badge">Administrator</div>
+            </div>
+        </header>
 
-    <tbody>
-        {% for a in appointments %}
-        <tr>
-            <td>{{ a.id }}</td>
-            <td>{{ a.patient.full_name }}</td>
-            <td>{{ a.doctor_name }}</td>
-            <td>{{ a.date }}</td>
-            <td>{{ a.time }}</td>
-            <td>{{ a.status }}</td>
-        </tr>
+        <div class="dashboard-content-wrapper">
+            <section class="appointments-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-check"></i> All Appointments</h2>
+                    <a href="{{ url_for('add_appointment') }}" class="add-btn">
+                        <i class="fas fa-plus"></i> Add Appointment
+                    </a>
+                </div>
+
+                <table class="table-container">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.id }}</td>
+                            <td>{{ appointment.patient.full_name if appointment.patient else 'N/A' }}</td>
+                            <td>{{ appointment.doctor_name or 'N/A' }}</td>
+                            <td>{{ appointment.date.strftime('%Y-%m-%d') if appointment.date else 'N/A' }}</td>
+                            <td>{{ appointment.time or 'N/A' }}</td>
+                            <td>
+                                {% if appointment.status == 'Pending' %}
+                                    <span class="status-badge status-pending">{{ appointment.status }}</span>
+                                {% elif appointment.status == 'Completed' %}
+                                    <span class="status-badge status-completed">{{ appointment.status }}</span>
+                                {% elif appointment.status == 'In Progress' %}
+                                    <span class="status-badge status-in-progress">{{ appointment.status }}</span>
+                                {% else %}
+                                    <span class="status-badge">{{ appointment.status or 'N/A' }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('edit_appointment', appointment_id=appointment.id) }}" class="action-btn edit-btn">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a href="{{ url_for('delete_appointment', appointment_id=appointment.id) }}" class="action-btn delete-btn" onclick="return confirm('Are you sure you want to delete this appointment?')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if not appointments %}
+                <div style="text-align: center; padding: 40px; color: #6c757d;">
+                    <i class="fas fa-calendar-times" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                    <p>No appointments found.</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+    </main>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">
+            {{ msg }}
+        </div>
         {% endfor %}
-    </tbody>
-</table>
+    </div>
+    {% endif %}
+{% endwith %}
 {% endblock %}

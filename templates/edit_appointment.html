@@ -1,38 +1,119 @@
-<h2>Edit Appointment</h2>
+{% extends "base.html" %}
 
-<form method="POST">
-    <label>Patient:</label>
-    <select name="patient_id" required>
-        {% for patient in patients %}
-        <option value="{{ patient.id }}" {% if appointment.patient_id == patient.id %}selected{% endif %}>
-            {{ patient.full_name }}
-        </option>
-        {% endfor %}
-    </select>
+{% block title %}Edit Appointment - CarePoint{% endblock %}
 
-    <label>Doctor Name:</label>
-    <input type="text" name="doctor_name" value="{{ appointment.doctor_name }}" required>
+{% block head %}
+<style>
+    /* Hide the main navigation header for edit pages */
+    header {
+        display: none !important;
+    }
 
-    <label>Date:</label>
-    <input type="date" name="date" value="{{ appointment.date }}" required>
+    /* Adjust main content to take full height */
+    main {
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
+    }
+</style>
+{% endblock %}
 
-    <label>Time:</label>
-    <input type="time" name="time" value="{{ appointment.time }}" required>
+{% block content %}
+<div class="admin-dashboard-container">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-user-shield"></i> Admin Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('view_patients') }}"><i class="fas fa-user-injured"></i> Patients</a></li>
+                <li><a href="{{ url_for('view_appointments') }}" class="active"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('view_staff') }}"><i class="fas fa-user-md"></i> Staff</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
 
-    <label for="staff">Assign Staff:</label>
-    <select name="staff_id" id="staff">
-        <option value="">Select Staff</option>
-        {% for member in staff %}
-        <option value="{{ member.id }}" {% if member.id == appointment.staff_id %}selected{% endif %}>{{ member.name }} ({{ member.role }})</option>
-        {% endfor %}
-    </select>
+    <!-- MAIN CONTENT -->
+    <main class="admin-main-content">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1 class="welcome-message">Edit Appointment</h1>
+            </div>
+        </header>
 
-    <label>Status:</label>
-    <select name="status">
-        <option value="Pending" {% if appointment.status == 'Pending' %}selected{% endif %}>Pending</option>
-        <option value="Completed" {% if appointment.status == 'Completed' %}selected{% endif %}>Completed</option>
-        <option value="Cancelled" {% if appointment.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
-    </select>
+        <div class="dashboard-content-wrapper">
+            <!-- Edit Form Section -->
+            <section class="edit-form-section">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2><i class="fas fa-edit"></i> Appointment Details</h2>
+                        <p>Update appointment information below</p>
+                    </div>
 
-    <button type="submit">Update Appointment</button>
-</form>
+                    <form method="POST" class="edit-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="patient_id"><i class="fas fa-user-injured"></i> Patient</label>
+                                <select name="patient_id" id="patient_id" required>
+                                    {% for patient in patients %}
+                                    <option value="{{ patient.id }}" {% if appointment.patient_id == patient.id %}selected{% endif %}>
+                                        {{ patient.full_name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="staff_id"><i class="fas fa-user-md"></i> Assign Staff</label>
+                                <select name="staff_id" id="staff_id" required>
+                                    <option value="">Select Staff</option>
+                                    {% for member in staff %}
+                                    <option value="{{ member.id }}" {% if member.id == appointment.staff_id %}selected{% endif %}>{{ member.name }} ({{ member.role }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="doctor_name"><i class="fas fa-stethoscope"></i> Doctor Name</label>
+                                <input type="text" id="doctor_name" name="doctor_name" value="{{ appointment.doctor_name }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="date"><i class="fas fa-calendar-alt"></i> Date</label>
+                                <input type="date" id="date" name="date" value="{{ appointment.date }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="time"><i class="fas fa-clock"></i> Time</label>
+                                <input type="time" id="time" name="time" value="{{ appointment.time }}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status"><i class="fas fa-info-circle"></i> Status</label>
+                                <select name="status" id="status">
+                                    <option value="Pending" {% if appointment.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="In Progress" {% if appointment.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="Completed" {% if appointment.status == 'Completed' %}selected{% endif %}>Completed</option>
+                                    <option value="Cancelled" {% if appointment.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Update Appointment
+                            </button>
+                            <a href="{{ url_for('view_appointments') }}" class="btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Appointments
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+{% endblock %}
