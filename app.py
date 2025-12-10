@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, date
 from flask import Flask, render_template, redirect, url_for, session, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -74,7 +74,6 @@ def admin_reports():
     patients = Patient.query.all()
     appointments = Appointment.query.all()
     staff = Staff.query.all()
-    from datetime import date
     today = date.today()
     todays_appointments = [appt for appt in appointments if appt.date == today]
     return render_template("admin_reports.html",
@@ -144,14 +143,19 @@ def add_appointment():
 
     if request.method == "POST":
         patient_id = request.form.get("patient_id")
+        doctor_id = request.form.get("doctor_id")
         staff_id = request.form.get("staff_id")
-        doctor_name = request.form.get("doctor_name")
         date = request.form.get("date")
         time = request.form.get("time")
 
-        # --- FIX: Convert empty staff_id "" → None ---
+        # Get doctor information from selected doctor
+        doctor = Staff.query.get_or_404(doctor_id)
+        doctor_name = doctor.name
+
+        # --- FIX: Assign doctor as responsible staff member (doctor_id → staff_id) ---
+        # If no additional staff assigned, use the doctor as the staff_id
         if not staff_id or staff_id.strip() == "":
-            staff_id = None
+            staff_id = int(doctor_id)  # Doctor is assigned by default
         else:
             staff_id = int(staff_id)
 
@@ -163,7 +167,7 @@ def add_appointment():
         # --- Create appointment safely ---
         appointment = Appointment(
             patient_id=int(patient_id),
-            staff_id=staff_id,  # now safe for nullable integer
+            staff_id=staff_id,  # Doctor is assigned as responsible staff
             doctor_name=doctor_name,
             date=datetime.strptime(date, "%Y-%m-%d").date(),
             time=time,
@@ -178,8 +182,9 @@ def add_appointment():
 
     # GET request
     patients = Patient.query.all()
+    doctors = Staff.query.filter_by(role="doctor").all()
     staff = Staff.query.all()
-    return render_template("add_appointment.html", patients=patients, staff=staff)
+    return render_template("add_appointment.html", patients=patients, doctors=doctors, staff=staff)
 
 
 @app.route("/admin/appointments/edit/<int:appointment_id>", methods=["GET", "POST"])
@@ -190,8 +195,19 @@ def edit_appointment(appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
     if request.method == "POST":
         appointment.patient_id = request.form.get("patient_id")
-        appointment.staff_id = request.form.get("staff_id")
-        appointment.doctor_name = request.form.get("doctor_name")
+        
+        # Get doctor from selected doctor_id
+        doctor_id = request.form.get("doctor_id")
+        doctor = Staff.query.get_or_404(doctor_id)
+        appointment.doctor_name = doctor.name
+        
+        # Assign doctor as responsible staff member (doctor_id → staff_id)
+        staff_id = request.form.get("staff_id")
+        if not staff_id or staff_id.strip() == "":
+            appointment.staff_id = int(doctor_id)  # Doctor is assigned by default
+        else:
+            appointment.staff_id = int(staff_id)
+        
         appointment.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         appointment.time = request.form.get("time")
         appointment.status = request.form.get("status")
@@ -199,8 +215,9 @@ def edit_appointment(appointment_id):
         flash("Appointment updated!", "success")
         return redirect(url_for("view_appointments"))
     patients = Patient.query.all()
+    doctors = Staff.query.filter_by(role="doctor").all()
     staff = Staff.query.all()
-    return render_template("edit_appointment.html", appointment=appointment, patients=patients, staff=staff)
+    return render_template("edit_appointment.html", appointment=appointment, patients=patients, doctors=doctors, staff=staff)
 
 @app.route("/admin/appointments/delete/<int:appointment_id>")
 def delete_appointment(appointment_id):
@@ -285,161 +302,324 @@ def user_login():
             session["user"] = patient.username
             session["role"] = "viewer"
             flash("Login successful!", "success")
-            return redirect(url_for("patient_dashboard"))
+            return redirect(url_for("patient_dashboard_home"))
         flash("Invalid credentials", "danger")
     return render_template("user_login.html")
 
 # -----------------------
 # PATIENT DASHBOARD
 # -----------------------
-@app.route("/patient_dashboard/about")
-def patient_dashboard_about():
-    if session.get("role") not in ["viewer", "patient"]:
-        flash("Access denied.", "danger")
-        return redirect(url_for("user_login"))
-
-    username = session.get("user")
-    patient = Patient.query.filter_by(username=username).first()
-
-    return render_template("patient_dashboard_about.html", patient=patient)
 @app.route("/patient/dashboard")
-def patient_dashboard():
-    if session.get("role") not in ["viewer", "patient"]:
+def patient_dashboard_home():
+    if session.get("role") != "viewer":
         flash("Access denied.", "danger")
         return redirect(url_for("user_login"))
-
-    username = session.get("user")
-    patient = Patient.query.filter_by(username=username).first()
-
-    return render_template("patient_dashboard.html", patient=patient)
-    appointment = Appointment.query.filter_by(patient_id=patient.id).all()
-    return render_template("patient_dashboard.html", patient=patient, appointment=appointment)
-
-
-
-
-
-@app.route("/patient/records")
-def patient_records():
-    if session.get("role") not in ["viewer", "patient"]:
-        flash("Access denied.", "danger")
-        return redirect(url_for("user_login"))
-
-    username = session.get("user")
-    patient = Patient.query.filter_by(username=username).first()
-
+    patient = Patient.query.filter_by(username=session.get("user")).first()
     if not patient:
         flash("Patient not found.", "danger")
-        return redirect(url_for("patient_dashboard"))
-
+        return redirect(url_for("user_login"))
+    appointments = Appointment.query.filter_by(patient_id=patient.id).all()
     medical_records = MedicalRecord.query.filter_by(patient_id=patient.id).all()
+    return render_template("patient_dashboard_home.html", patient=patient, appointments=appointments, medical_records=medical_records)
 
-    return render_template("patient_records.html", medical_records=medical_records)
-
-
-@app.route("/add/appointment/patient", methods=["GET", "POST"])
-def add_appointment_patient():
-    if session.get("role") not in ["viewer", "patient"]:
+@app.route("/patient/appointments")
+def patient_appointments():
+    if session.get("role") != "viewer":
         flash("Access denied.", "danger")
         return redirect(url_for("user_login"))
+    patient = Patient.query.filter_by(username=session.get("user")).first()
+    if not patient:
+        flash("Patient not found.", "danger")
+        return redirect(url_for("user_login"))
+    appointments = Appointment.query.filter_by(patient_id=patient.id).all()
+    return render_template("appointments_patients.html", patient=patient, appointments=appointments)
 
-    username = session.get("user")
-    patient = Patient.query.filter_by(username=username).first()
-
+@app.route("/patient/appointments/add", methods=["GET", "POST"])
+def add_patient_appointment():
+    if session.get("role") != "viewer":
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    patient = Patient.query.filter_by(username=session.get("user")).first()
+    if not patient:
+        flash("Patient not found.", "danger")
+        return redirect(url_for("user_login"))
+    
     if request.method == "POST":
-        doctor_name = request.form.get("doctor_name")
-        date = request.form.get("date")
-        time = request.form.get("time")
+        doctor_id = request.form.get("doctor_id")
         staff_id = request.form.get("staff_id")
-
-        staff_id = int(staff_id) if staff_id and staff_id.strip() else None
-
+        appt_date = request.form.get("date")
+        appt_time = request.form.get("time")
+        
+        # Get doctor information from selected doctor
+        doctor = Staff.query.get_or_404(doctor_id)
+        doctor_name = doctor.name
+        
+        # Handle nullable staff_id (for additional staff assignment)
+        if not staff_id or staff_id.strip() == "":
+            staff_id = None
+        else:
+            staff_id = int(staff_id)
+        
         appointment = Appointment(
             patient_id=patient.id,
             staff_id=staff_id,
             doctor_name=doctor_name,
-            date=datetime.strptime(date, "%Y-%m-%d").date(),
-            time=time,
+            date=datetime.strptime(appt_date, "%Y-%m-%d").date(),
+            time=appt_time,
             status="Pending"
         )
-
         db.session.add(appointment)
         db.session.commit()
-
-        flash("Appointment created!", "success")
+        flash("Appointment request submitted!", "success")
         return redirect(url_for("patient_appointments"))
-
-    staff = Staff.query.all()
-    return render_template("add_appointment_patient.html", patient=patient, staff=staff)
-
-
     
-
-@app.route("/patient/appointments")
-def patient_appointments():
-    if session.get("role") not in ["viewer", "patient"]:
-        flash("Access denied.", "danger")
-        return redirect(url_for("user_login"))
-
-    username = session.get("user")
-    patient = Patient.query.filter_by(username=username).first()
-
-    appointments = Appointment.query.filter_by(patient_id=patient.id).all()
-
-    return render_template("appointments_patient.html", appointments=appointments, patient=patient)
-
+    # Get doctors (staff with role 'doctor')
+    doctors = Staff.query.filter_by(role="doctor").all()
+    staff = Staff.query.all()
+    return render_template("add_appointment_patient.html", doctors=doctors, staff=staff)
 
 @app.route("/patient/appointments/edit/<int:appointment_id>", methods=["GET", "POST"])
-def edit_appointment_patient(appointment_id):
-    if session.get("role") not in ["viewer", "patient"]:
+def edit_patient_appointment(appointment_id):
+    if session.get("role") != "viewer":
         flash("Access denied.", "danger")
         return redirect(url_for("user_login"))
-
-    username = session.get("user")
-    patient = Patient.query.filter_by(username=username).first()
-
+    patient = Patient.query.filter_by(username=session.get("user")).first()
+    if not patient:
+        flash("Patient not found.", "danger")
+        return redirect(url_for("user_login"))
+    
     appointment = Appointment.query.get_or_404(appointment_id)
-
     if appointment.patient_id != patient.id:
-        flash("You can only edit your own appointments.", "danger")
+        flash("Unauthorized access.", "danger")
         return redirect(url_for("patient_appointments"))
-
+    
     if request.method == "POST":
-        appointment.doctor_name = request.form.get("doctor_name")
+        doctor_id = request.form.get("doctor_id")
+        staff_id = request.form.get("staff_id")
+        
+        # Get doctor information from selected doctor
+        doctor = Staff.query.get_or_404(doctor_id)
+        appointment.doctor_name = doctor.name
+        
+        if not staff_id or staff_id.strip() == "":
+            appointment.staff_id = None
+        else:
+            appointment.staff_id = int(staff_id)
+        
         appointment.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         appointment.time = request.form.get("time")
-        appointment.staff_id = request.form.get("staff_id") or None
-
         db.session.commit()
-
         flash("Appointment updated!", "success")
         return redirect(url_for("patient_appointments"))
-
+    
+    doctors = Staff.query.filter_by(role="doctor").all()
     staff = Staff.query.all()
-    return render_template("edit_appointment_patient.html", appointment=appointment, staff=staff)
-
+    return render_template("edit_appointment_patient.html", appointment=appointment, doctors=doctors, staff=staff)
 
 @app.route("/patient/appointments/delete/<int:appointment_id>")
-def delete_appointment_patient(appointment_id):
-    if session.get("role") not in ["viewer", "patient"]:
+def delete_patient_appointment(appointment_id):
+    if session.get("role") != "viewer":
         flash("Access denied.", "danger")
         return redirect(url_for("user_login"))
-
-    username = session.get("user")
-    patient = Patient.query.filter_by(username=username).first()
-
+    patient = Patient.query.filter_by(username=session.get("user")).first()
+    if not patient:
+        flash("Patient not found.", "danger")
+        return redirect(url_for("user_login"))
+    
     appointment = Appointment.query.get_or_404(appointment_id)
-
     if appointment.patient_id != patient.id:
-        flash("You can only delete your own appointments.", "danger")
+        flash("Unauthorized access.", "danger")
         return redirect(url_for("patient_appointments"))
-
-    db.session.delete(appointment)
-    db.session.commit()
-
-    flash("Appointment deleted!", "success")
+    
+    try:
+        db.session.delete(appointment)
+        db.session.commit()
+        flash("Appointment deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred while deleting the appointment.", "danger")
     return redirect(url_for("patient_appointments"))
 
+@app.route("/patient/records")
+def patient_dashboard_records():
+    if session.get("role") != "viewer":
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    patient = Patient.query.filter_by(username=session.get("user")).first()
+    if not patient:
+        flash("Patient not found.", "danger")
+        return redirect(url_for("user_login"))
+    medical_records = MedicalRecord.query.filter_by(patient_id=patient.id).all()
+    return render_template("patient_records.html", patient=patient, medical_records=medical_records)
+
+# -----------------------
+# STAFF LOGIN & DASHBOARD
+# -----------------------
+@app.route("/staff_login", methods=["GET", "POST"])
+def staff_login():
+    form = StaffLoginForm()
+    if form.validate_on_submit():
+        staff = Staff.query.filter_by(username=form.username.data).first()
+        if staff and check_password_hash(staff.password, form.password.data):
+            session['user'] = staff.username
+            session['role'] = 'staff'
+            session['staff_id'] = staff.id
+            flash("Staff login successful!", "success")
+            return redirect(url_for('staff_dashboard'))
+        flash("Invalid staff credentials", "danger")
+    return render_template("staff_login.html", form=form)
+
+@app.route("/staff/dashboard")
+def staff_dashboard():
+    if session.get("role") != "staff":
+        flash("Access denied.", "danger")
+        return redirect(url_for("staff_login"))
+    staff_id = session.get("staff_id")
+    staff_member = Staff.query.get_or_404(staff_id)
+    appointments = Appointment.query.filter_by(staff_id=staff_id).all()
+    
+    # Get unique patients for this staff member from their appointments
+    patient_ids = [appt.patient_id for appt in appointments]
+    patients = Patient.query.filter(Patient.id.in_(patient_ids)).all() if patient_ids else []
+    
+    # Get medical records for all of the staff member's patients
+    medical_records = MedicalRecord.query.filter(MedicalRecord.patient_id.in_(patient_ids)).all() if patient_ids else []
+    
+    return render_template("staff_dashboard.html", staff=staff_member, appointments=appointments, patients=patients, medical_records=medical_records)
+
+
+@app.route('/staff/appointments/update_status/<int:appointment_id>', methods=['POST'])
+def staff_update_appointment_status(appointment_id):
+    if session.get('role') != 'staff':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('staff_login'))
+    staff_id = session.get('staff_id')
+    appointment = Appointment.query.get_or_404(appointment_id)
+    if appointment.staff_id != staff_id:
+        flash("You don't have permission to modify this appointment.", 'danger')
+        return redirect(url_for('staff_dashboard'))
+    # only allow updating status (and optional date/time if provided)
+    status = request.form.get('status')
+    if status:
+        appointment.status = status
+    # optional date/time
+    date = request.form.get('date')
+    time = request.form.get('time')
+    if date:
+        try:
+            appointment.date = datetime.strptime(date, '%Y-%m-%d').date()
+        except Exception:
+            pass
+    if time:
+        appointment.time = time
+    db.session.commit()
+    flash('Appointment updated.', 'success')
+    return redirect(url_for('staff_dashboard'))
+
+
+@app.route('/staff/appointments/delete/<int:appointment_id>', methods=['POST'])
+def staff_delete_appointment(appointment_id):
+    if session.get('role') != 'staff':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('staff_login'))
+    staff_id = session.get('staff_id')
+    appointment = Appointment.query.get_or_404(appointment_id)
+    if appointment.staff_id != staff_id:
+        flash("You don't have permission to delete this appointment.", 'danger')
+        return redirect(url_for('staff_dashboard'))
+    db.session.delete(appointment)
+    db.session.commit()
+    flash('Appointment deleted.', 'success')
+    return redirect(url_for('staff_dashboard'))
+
+# -----------------------
+# STAFF MEDICAL RECORDS ROUTES
+# -----------------------
+@app.route("/staff/add_medical_record/<int:patient_id>", methods=["GET", "POST"])
+def staff_add_medical_record(patient_id):
+    if session.get("role") != "staff":
+        flash("Access denied.", "danger")
+        return redirect(url_for("staff_login"))
+    
+    staff_id = session.get("staff_id")
+    
+    # Verify this patient is assigned to this staff member
+    appointment = Appointment.query.filter_by(patient_id=patient_id, staff_id=staff_id).first()
+    if not appointment:
+        flash("You don't have access to this patient.", "danger")
+        return redirect(url_for("staff_dashboard"))
+    
+    patient = Patient.query.get_or_404(patient_id)
+    
+    if request.method == "POST":
+        diagnosis = request.form.get("diagnosis")
+        prescription = request.form.get("prescription")
+        lab_result = request.form.get("lab_result")
+        
+        medical_record = MedicalRecord(
+            patient_id=patient_id,
+            diagnosis=diagnosis,
+            prescription=prescription,
+            lab_result=lab_result
+        )
+        
+        db.session.add(medical_record)
+        db.session.commit()
+        
+        flash("Medical record added successfully!", "success")
+        return redirect(url_for("staff_dashboard"))
+    
+    return render_template("staff_add_medical_record.html", patient=patient)
+
+@app.route("/staff/edit_medical_record/<int:record_id>", methods=["GET", "POST"])
+def staff_edit_medical_record(record_id):
+    if session.get("role") != "staff":
+        flash("Access denied.", "danger")
+        return redirect(url_for("staff_login"))
+    
+    staff_id = session.get("staff_id")
+    medical_record = MedicalRecord.query.get_or_404(record_id)
+    
+    # Verify this patient is assigned to this staff member
+    appointment = Appointment.query.filter_by(patient_id=medical_record.patient_id, staff_id=staff_id).first()
+    if not appointment:
+        flash("You don't have access to this record.", "danger")
+        return redirect(url_for("staff_dashboard"))
+    
+    patient = medical_record.patient
+    
+    if request.method == "POST":
+        medical_record.diagnosis = request.form.get("diagnosis")
+        medical_record.prescription = request.form.get("prescription")
+        medical_record.lab_result = request.form.get("lab_result")
+        
+        db.session.commit()
+        
+        flash("Medical record updated successfully!", "success")
+        return redirect(url_for("staff_dashboard"))
+    
+    return render_template("staff_edit_medical_record.html", medical_record=medical_record, patient=patient)
+
+@app.route("/staff/delete_medical_record/<int:record_id>", methods=["POST"])
+def staff_delete_medical_record(record_id):
+    if session.get("role") != "staff":
+        flash("Access denied.", "danger")
+        return redirect(url_for("staff_login"))
+    
+    staff_id = session.get("staff_id")
+    medical_record = MedicalRecord.query.get_or_404(record_id)
+    
+    # Verify this patient is assigned to this staff member
+    appointment = Appointment.query.filter_by(patient_id=medical_record.patient_id, staff_id=staff_id).first()
+    if not appointment:
+        flash("You don't have access to this record.", "danger")
+        return redirect(url_for("staff_dashboard"))
+    
+    db.session.delete(medical_record)
+    db.session.commit()
+    
+    flash("Medical record deleted successfully!", "success")
+    return redirect(url_for("staff_dashboard"))
 
 # -----------------------
 # LOGOUT
@@ -447,60 +627,8 @@ def delete_appointment_patient(appointment_id):
 @app.route("/logout")
 def logout():
     session.clear()
-    flash("Logged out successfully.", "info")
+    flash("You have been logged out.", "success")
     return redirect(url_for("home"))
-
-# -----------------------
-# STAFF LOGIN & DASHBOARD
-# -----------------------
-@app.route("/staff/login", methods=["GET", "POST"])
-def staff_login():
-    form = StaffLoginForm()
-    if form.validate_on_submit():
-        staff = Staff.query.filter_by(username=form.username.data).first()
-        if staff and check_password_hash(staff.password, form.password.data):
-            session["role"] = "staff"
-            session["staff_id"] = staff.id
-            flash("Login successful!", "success")
-            return redirect(url_for("staff_dashboard_view"))
-        flash("Invalid username or password", "danger")
-    return render_template("staff_login.html", form=form)
-
-@app.route("/staff/dashboard")
-def staff_dashboard_view():
-    if session.get("role") != "staff":
-        flash("Access denied.", "danger")
-        return redirect(url_for("staff_login"))
-    staff_id = session.get("staff_id")
-    if not staff_id:
-        flash("Session expired. Please log in again.", "danger")
-        return redirect(url_for("staff_login"))
-    staff = Staff.query.get(staff_id)
-    if not staff:
-        flash("Staff member not found.", "danger")
-        return redirect(url_for("staff_login"))
-    appointments = Appointment.query.filter_by(staff_id=staff_id).all()
-    return render_template("staff_dashboard.html", staff=staff, appointments=appointments)
-
-@app.route("/staff/appointments/update/<int:appointment_id>", methods=["POST"])
-def staff_update_appointment_status(appointment_id):
-    """Renamed to avoid endpoint conflict"""
-    if session.get("role") != "staff":
-        flash("Access denied.", "danger")
-        return redirect(url_for("staff_login"))
-    staff_id = session.get("staff_id")
-    appointment = Appointment.query.get_or_404(appointment_id)
-    if appointment.staff_id != staff_id:
-        flash("You cannot update this appointment.", "danger")
-        return redirect(url_for("staff_dashboard_view"))
-    new_status = request.form.get("status")
-    if new_status in ["Pending", "In Progress", "Completed"]:
-        appointment.status = new_status
-        db.session.commit()
-        flash("Appointment status updated!", "success")
-    else:
-        flash("Invalid status.", "danger")
-    return redirect(url_for("staff_dashboard_view"))
 
 # -----------------------
 # STAFF MANAGEMENT ROUTES
@@ -604,10 +732,14 @@ def delete_staff(staff_id):
     if session.get("role") != "admin":
         flash("Access denied.", "danger")
         return redirect(url_for("admin_login"))
-    staff_member = Staff.query.get_or_404(staff_id)
-    db.session.delete(staff_member)
-    db.session.commit()
-    flash("Staff deleted successfully!", "success")
+    try:
+        staff_member = Staff.query.get_or_404(staff_id)
+        db.session.delete(staff_member)
+        db.session.commit()
+        flash("Staff deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash("An error occurred while deleting staff.", "danger")
     return redirect(url_for("view_staff"))
 
 # -----------------------

@@ -330,9 +330,9 @@
         </div>
          <nav class="sidebar-nav">
             <ul>
-                <li><a href="{{ url_for('patient_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="{{ url_for('view_appointments_patients') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="{{ url_for('patient_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
+                <li><a href="{{ url_for('patient_dashboard_home') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('patient_appointments') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('patient_dashboard_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
                 <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
@@ -343,7 +343,7 @@
         <header class="admin-header">
             <div class="header-content">
                 <h1 class="welcome-message">Add New Appointment</h1>
-                <div class="admin-role-badge">Administrator</div>
+                <div class="admin-role-badge">Patient</div>
             </div>
         </header>
 
@@ -356,20 +356,25 @@
                 <form method="POST">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="patient_id">Patient <span class="required">*</span></label>
-                            <select name="patient_id" id="patient_id" class="form-select" required>
-                                <option value="">Select a patient</option>
-                                {% for patient in patients %}
-                                <option value="{{ patient.id }}">{{ patient.full_name }} (ID: {{ patient.id }})</option>
+                            <label for="doctor_id">Doctor <span class="required">*</span></label>
+                            <select name="doctor_id" id="doctor_id" class="form-select" required>
+                                <option value="">Select a doctor</option>
+                                {% for doctor in doctors %}
+                                <option value="{{ doctor.id }}">{{ doctor.name }}</option>
                                 {% endfor %}
                             </select>
-                            <div class="form-help">Choose the patient for this appointment</div>
+                            <div class="form-help">Select the doctor for this appointment</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="doctor_name">Doctor Name <span class="required">*</span></label>
-                            <input type="text" name="doctor_name" id="doctor_name" class="form-control" placeholder="Enter doctor's name" required>
-                            <div class="form-help">Full name of the attending physician</div>
+                            <label for="staff_id">Assign Additional Staff</label>
+                            <select name="staff_id" id="staff_id" class="form-select">
+                                <option value="">Select staff member (optional)</option>
+                                {% for member in staff %}
+                                <option value="{{ member.id }}">{{ member.name }} - {{ member.role }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-help">Assign additional staff to handle this appointment</div>
                         </div>
                     </div>
 
@@ -385,17 +390,6 @@
                             <input type="time" name="time" id="time" class="form-control" required>
                             <div class="form-help">Select the time for the appointment</div>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="staff_id">Assign Staff Member</label>
-                        <select name="staff_id" id="staff_id" class="form-select">
-                            <option value="">Select staff member (optional)</option>
-                            {% for member in staff %}
-                            <option value="{{ member.id }}">{{ member.name }} - {{ member.role }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="form-help">Assign a staff member to handle this appointment</div>
                     </div>
 
                     <div class="btn-container">

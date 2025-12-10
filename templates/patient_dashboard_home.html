@@ -1,9 +1,10 @@
-{% extends "patient_dashboard.html" %}
+{% extends "base.html" %}
 
-{% block title %}Patient Dashboard Home{% endblock %}
+{% block title %}Patient Dashboard - CarePoint{% endblock %}
 
 {% block head %}
 <style>
+    /* Hide main header for dashboard pages */
     header {
         display: none !important;
     }
@@ -18,25 +19,17 @@
 
 {% block content %}
 <div class="admin-dashboard-container">
-
     <!-- SIDEBAR -->
     <aside class="admin-sidebar">
         <div class="sidebar-header">
-            <h2> Patient Panel</h2>
+            <h2><i class="fas fa-user"></i> Patient Panel</h2>
         </div>
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="{{ url_for('patient_dashboard') }}" class="active">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-
-                <li><a href="{{ url_for('patient_appointments_view') }}">
-                    <i class="fas fa-calendar-check"></i> Appointments</a></li>
-
-                <li><a href="{{ url_for('patient_records') }}">
-                    <i class="fas fa-chart-bar"></i> Medical Records</a></li>
-
-                <li><a href="{{ url_for('logout') }}">
-                    <i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="{{ url_for('patient_dashboard_home') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('patient_appointments') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('patient_dashboard_records') }}"><i class="fas fa-file-medical"></i> Medical Records</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
     </aside>
@@ -49,47 +42,229 @@
                 <div class="admin-role-badge">Patient</div>
             </div>
         </header>
+
+        <div class="dashboard-content-wrapper">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <div class="welcome-card">
+                    <h2><i class="fas fa-heart"></i> Welcome to CarePoint</h2>
+                    <p>Manage your appointments, track your medical records, and maintain your health information easily.</p>
+                </div>
+            </section>
+
+            <!-- Patient Stats Section -->
+            <section class="stats-section">
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ appointments | length }}</h3>
+                            <p>Total Appointments</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ appointments | selectattr('status', 'equalto', 'Pending') | list | length }}</h3>
+                            <p>Pending Appointments</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-medical"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ medical_records | length }}</h3>
+                            <p>Medical Records</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ patient.age or 'N/A' }}</h3>
+                            <p>Your Age</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Patient Health Information Section -->
+            <section class="management-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-heartbeat"></i> Your Health Information</h2>
+                </div>
+
+                <div class="health-info-cards">
+                    <div class="health-info-card">
+                        <div class="health-info-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="health-info-content">
+                            <h4>Full Name</h4>
+                            <p>{{ patient.full_name or 'Not Specified' }}</p>
+                        </div>
+                    </div>
+                    <div class="health-info-card">
+                        <div class="health-info-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="health-info-content">
+                            <h4>Blood Type</h4>
+                            <p>{{ patient.blood_type or 'Not Specified' }}</p>
+                        </div>
+                    </div>
+                    <div class="health-info-card">
+                        <div class="health-info-icon">
+                            <i class="fas fa-ruler-vertical"></i>
+                        </div>
+                        <div class="health-info-content">
+                            <h4>Height</h4>
+                            <p>{{ patient.height or 'Not Specified' }}</p>
+                        </div>
+                    </div>
+                    <div class="health-info-card">
+                        <div class="health-info-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div class="health-info-content">
+                            <h4>Country of Origin</h4>
+                            <p>{{ patient.country_origin or 'Not Specified' }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appointments Section -->
+            <section class="management-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-check"></i> Your Appointments</h2>
+                    <a href="{{ url_for('add_patient_appointment') }}" class="btn-add-new">
+                        <i class="fas fa-plus"></i> Book Appointment
+                    </a>
+                </div>
+
+                {% if appointments %}
+                <div class="table-container">
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-id-badge"></i> ID</th>
+                                <th><i class="fas fa-user-md"></i> Doctor</th>
+                                <th><i class="fas fa-calendar-alt"></i> Date</th>
+                                <th><i class="fas fa-clock"></i> Time</th>
+                                <th><i class="fas fa-info-circle"></i> Status</th>
+                                <th><i class="fas fa-cogs"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in appointments %}
+                            <tr class="management-row">
+                                <td>{{ appt.id }}</td>
+                                <td>{{ appt.doctor_name }}</td>
+                                <td>{{ appt.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ appt.time }}</td>
+                                <td>
+                                    {% if appt.status == 'Pending' %}
+                                        <span class="status-badge status-pending">{{ appt.status }}</span>
+                                    {% elif appt.status == 'Completed' %}
+                                        <span class="status-badge status-completed">{{ appt.status }}</span>
+                                    {% elif appt.status == 'In Progress' %}
+                                        <span class="status-badge status-in-progress">{{ appt.status }}</span>
+                                    {% elif appt.status == 'Cancelled' %}
+                                        <span class="status-badge status-cancelled">{{ appt.status }}</span>
+                                    {% else %}
+                                        <span class="status-badge">{{ appt.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('edit_patient_appointment', appointment_id=appt.id) }}" class="btn-edit">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{{ url_for('delete_patient_appointment', appointment_id=appt.id) }}" class="btn-delete" onclick="return confirm('Are you sure?')">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <div class="no-data-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>No Appointments Yet</h3>
+                    <p>You haven't booked any appointments. Schedule one now to get started.</p>
+                    <a href="{{ url_for('add_patient_appointment') }}" class="btn-add-new">
+                        <i class="fas fa-plus"></i> Book Your First Appointment
+                    </a>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Medical Records Section -->
+            <section class="management-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-file-medical"></i> Your Medical Records</h2>
+                    <a href="{{ url_for('patient_dashboard_records') }}" class="btn-view-all">
+                        <i class="fas fa-eye"></i> View All Records
+                    </a>
+                </div>
+
+                {% if medical_records %}
+                <div class="table-container">
+                    <table class="management-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-id-badge"></i> ID</th>
+                                <th><i class="fas fa-calendar-alt"></i> Date</th>
+                                <th><i class="fas fa-stethoscope"></i> Diagnosis</th>
+                                <th><i class="fas fa-prescription"></i> Prescription</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in medical_records %}
+                            <tr class="management-row">
+                                <td>{{ record.id }}</td>
+                                <td>{{ record.record_date.strftime('%Y-%m-%d') if record.record_date else 'N/A' }}</td>
+                                <td>{{ record.diagnosis or 'N/A' }}</td>
+                                <td>{{ record.prescription or 'N/A' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <div class="no-data-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <h3>No Medical Records</h3>
+                    <p>Your medical records will appear here once they are created by your healthcare provider.</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
     </main>
 </div>
 
-<!-- FLASH MESSAGES -->
+<!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flash-messages">
         {% for category, msg in messages %}
-            <div class="flash flash-{{ category }}">{{ msg }}</div>
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
         {% endfor %}
     </div>
     {% endif %}
 {% endwith %}
 {% endblock %}
-                    <input type="text" id="searchInput" placeholder="Search patients..." onkeyup="filterPatients()" />
-                </div>
-
-                <table class="management-table" id="patientsTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Full Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Date of Birth</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for patient in patients %}
-                        <tr>
-                            <td>{{ patient.id }}</td>
-                            <td>{{ patient.full_name }}</td>
-                            <td>{{ patient.email }}</td>
-                            <td>{{ patient.phone }}</td>
-                            <td>{{ patient.date_of_birth.strftime('%Y-%m-%d') }}</td>
-                            <td>
-                                <a href="{{ url_for('view_patient_details', patient_id=patient.id) }}" class="btn-view-details">
-                                    <i class="fas fa-info-circle"></i> View Details
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>

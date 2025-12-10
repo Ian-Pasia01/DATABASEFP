@@ -27,9 +27,9 @@
         </div>
          <nav class="sidebar-nav">
             <ul>
-                <li><a href="{{ url_for('patient_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="{{ url_for('view_appointments_patients') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="{{ url_for('patient_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
+                <li><a href="{{ url_for('patient_dashboard_home') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('patient_appointments') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('patient_dashboard_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
                 <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
@@ -48,7 +48,7 @@
             <section class="appointments-section">
                 <div class="section-header">
                     <h2><i class="fas fa-calendar-check"></i> Your Appointments</h2>
-                    <a href="{{ url_for('add_appointment_patient') }}" class="add-btn">
+                    <a href="{{ url_for('add_patient_appointment') }}" class="add-btn">
                         <i class="fas fa-plus"></i> Add Appointment
                     </a>
                 </div>
@@ -72,7 +72,7 @@
                             <td>{{ appointment.patient.full_name if appointment.patient else 'N/A' }}</td>
                             <td>{{ appointment.doctor_name or 'N/A' }}</td>
                             <td>{{ appointment.date.strftime('%Y-%m-%d') if appointment.date else 'N/A' }}</td>
-                            <td>{{ appointment.time or 'N/A' }}</td>
+                            <td>{{ appointment.time }}</td>
                             <td>
                                 {% if appointment.status == 'Pending' %}
                                     <span class="status-badge status-pending">{{ appointment.status }}</span>
@@ -85,10 +85,10 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('edit_appointment_patient', appointment_id=appointment.id) }}" class="action-btn edit-btn">
+                                <a href="{{ url_for('edit_patient_appointment', appointment_id=appointment.id) }}" class="action-btn edit-btn">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <a href="{{ url_for('delete_appointment_patient', appointment_id=appointment.id) }}" class="action-btn delete-btn" onclick="return confirm('Are you sure you want to delete this appointment?')">
+                                <a href="{{ url_for('delete_patient_appointment', appointment_id=appointment.id) }}" class="action-btn delete-btn" onclick="return confirm('Are you sure you want to delete this appointment?')">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
                             </td>

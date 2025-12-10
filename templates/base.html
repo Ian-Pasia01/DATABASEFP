@@ -49,5 +49,24 @@
     <footer>
         {% block footer %}{% endblock %}
     </footer>
+
+    <!-- Script to update active sidebar link -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all sidebar nav links
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav ul li a, .admin-sidebar .sidebar-nav ul li a');
+            
+            sidebarLinks.forEach(link => {
+                // Remove active class from all links
+                link.classList.remove('active');
+                
+                // Check if the link's href matches the current page
+                if (link.href === window.location.href || 
+                    link.pathname === window.location.pathname) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

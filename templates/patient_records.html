@@ -30,9 +30,9 @@
         </div>
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="{{ url_for('patient_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="{{ url_for('view_appointments_patients') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="{{ url_for('patient_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
+                <li><a href="{{ url_for('patient_dashboard_home') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('patient_appointments') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('patient_dashboard_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
                 <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
