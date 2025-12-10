@@ -37,27 +37,24 @@
 
 <!-- SERVICES SECTION -->
 <section id="services">
-    <div>
-        <img src="imgexample.jpeg" alt="Example Image">
-
-        <h5>Visual Appointment</h5>
-        <label>Easy to Use</label>
-        <p>Give yourself at least 10–15 minutes for paperwork.</p>
-
-        <ul>
-            <li>Be Honest <button><img src="arrow.jpeg"></button></li>
-            <li>Ask for Clarity <button><img src="arrow.jpeg"></button></li>
-            <li>At least 10–15 minutes <button><img src="arrow.jpeg"></button></li>
-        </ul>
-    </div>
-
-    <div>
-        <h5>Online Services</h5>
-        <button type="button">Video/Audio Calls with Doctors</button>
-        <button type="button">24/7 Availability</button>
-        <button type="button">Reminders & Notifications</button>
-        <button type="button">Prescription Services</button>
-    </div>
+        <div class="horizontal-scroll-container" id="scroll-container">
+            <div class="card" style="margin-left: 25px;">
+                <h3>Video/Audio Calls with Doctors</h3>
+                <p></p>
+            </div>
+            <div class="card">
+                <h3>24/7 Availability</h3>
+                <p></p>
+            </div>
+            <div class="card">
+                <h3>Reminders & Notifications</h3>
+                <p></p>
+            </div>
+            <div class="card">
+                <h3>Prescription Services</h3>
+                <p></p>
+            </div>
+        </div>
 </section>
 
 <!-- ACHIEVEMENTS SECTION -->
@@ -70,7 +67,7 @@
 <section id="gallery">
     <img src="imgexample.jpeg" alt="Clinic Image 1">
     <img src="imgexample.jpeg" alt="Clinic Image 2">
-    <img src="imgexample.jpeg" alt="Clinic Image 3">
+    <img src="{{ url_for('static', filename='pictures/Doctor-removebg-preview.png') }}" alt="Doctor Image"/>
     <img src="imgexample.jpeg" alt="Clinic Image 4">
     <img src="imgexample.jpeg" alt="Clinic Image 5">
 </section>

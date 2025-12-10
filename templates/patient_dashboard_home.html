@@ -2,27 +2,61 @@
 
 {% block title %}Patient Dashboard Home{% endblock %}
 
-{% block content %}
-<section id="profile">
-    <h1>Patient Profile</h1>
-    <div class="profile-info">
-        <img src="{{ url_for('static', filename='pictures/patient-icon-design-vector.jpg') }}" alt="Profile Picture" class="profile-pic">
-        <div class="details">
-            <p><strong>Name:</strong> {{ patient.full_name }}</p>
-            <p><strong>Blood Type:</strong> {{ patient.blood_type or 'Not specified' }}</p>
-            <p><strong>Height:</strong> {{ patient.height or 'Not specified' }}</p>
-            <p><strong>Age:</strong> {{ patient.age or 'Not specified' }}</p>
-        </div>
-    </div>
-</section>
+{% block head %}
+<style>
+    /* Hide the main navigation header for admin dashboard */
+    header {
+        display: none !important;
+    }
 
-<section id="appointments">
-    <h2>Appointments</h2>
-    <p>Here you can view and manage your appointments.</p>
-    <!-- Placeholder for appointment list or form -->
-    <ul>
-        <li>No upcoming appointments.</li>
-    </ul>
-    <button>Schedule New Appointment</button>
-</section>
+    /* Adjust main content to take full height */
+    main {
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard-container">
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2> Patient Panel</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="{{ url_for('patient_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="{{ url_for('view_appointments_patients') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+                <li><a href="{{ url_for('patient_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main-content">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1 class="welcome-message">Admin Dashboard</h1>
+                <div class="admin-role-badge">Administrator</div>
+            </div>
+        </header>
+
+        
+            
+    </main>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, msg in messages %}
+        <div class="flash flash-{{ category }}">{{ msg }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}
 {% endblock %}

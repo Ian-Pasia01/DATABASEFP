@@ -63,3 +63,23 @@ class Appointment(db.Model):
     time = db.Column(db.String(20), nullable=False)
     status = db.Column(db.String(20), default="Pending")
 
+
+class MedicalRecord(db.Model):
+    __tablename__ = "medical_records"
+
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
+    diagnosis = db.Column(db.Text)
+    prescription = db.Column(db.Text)
+    lab_result = db.Column(db.Text)
+    record_date = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    # Relationship back to Patient
+    patient = db.relationship('Patient', backref='medical_records', lazy=True)
+
+    def __repr__(self):
+        return f"<MedicalRecord {self.id} for Patient {self.patient_id}>"
+
+
+    
+

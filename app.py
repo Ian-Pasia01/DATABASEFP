@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, session, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import db, User, Patient, Admin, Staff, Appointment
+from models import db, User, Patient, Admin, Staff, Appointment, MedicalRecord
 from form import LoginForm, AdminLog, StaffLoginForm
 
 # -----------------------
@@ -141,26 +141,46 @@ def add_appointment():
     if session.get("role") != "admin":
         flash("Access denied.", "danger")
         return redirect(url_for("admin_login"))
+
     if request.method == "POST":
         patient_id = request.form.get("patient_id")
         staff_id = request.form.get("staff_id")
         doctor_name = request.form.get("doctor_name")
         date = request.form.get("date")
         time = request.form.get("time")
+
+        # --- FIX: Convert empty staff_id "" → None ---
+        if not staff_id or staff_id.strip() == "":
+            staff_id = None
+        else:
+            staff_id = int(staff_id)
+
+        # --- Validate patient ---
+        if not patient_id or not patient_id.isdigit():
+            flash("Please select a valid patient.", "danger")
+            return redirect(url_for("add_appointment"))
+
+        # --- Create appointment safely ---
         appointment = Appointment(
-            patient_id=patient_id,
-            staff_id=staff_id,
+            patient_id=int(patient_id),
+            staff_id=staff_id,  # now safe for nullable integer
             doctor_name=doctor_name,
             date=datetime.strptime(date, "%Y-%m-%d").date(),
-            time=time
+            time=time,
+            status="Pending"
         )
+
         db.session.add(appointment)
         db.session.commit()
+
         flash("Appointment created!", "success")
         return redirect(url_for("view_appointments"))
+
+    # GET request
     patients = Patient.query.all()
     staff = Staff.query.all()
     return render_template("add_appointment.html", patients=patients, staff=staff)
+
 
 @app.route("/admin/appointments/edit/<int:appointment_id>", methods=["GET", "POST"])
 def edit_appointment(appointment_id):
@@ -301,6 +321,111 @@ def patient_dashboard_announce():
         flash("Access denied.", "danger")
         return redirect(url_for("user_login"))
     return render_template("patient_dashboard_announce.html")
+
+@app.route("/patient/appointments")
+def view_appointments_patients():
+    appointments = Appointment.query.all()
+    return render_template("appointments_patients.html", appointments=appointments)
+
+@app.route("/patient/records")
+def patient_records():
+    if session.get("role") not in ["viewer", "patient"]:
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    username = session.get("user")
+    patient = Patient.query.filter_by(username=username).first()
+    if not patient:
+        flash("Patient not found.", "danger")
+        return redirect(url_for("patient_dashboard"))
+    medical_records = MedicalRecord.query.filter_by(patient_id=patient.id).all()
+    return render_template("patient_records.html", medical_records=medical_records)
+
+@app.route("/add/appointment/patient", methods=["GET", "POST"])
+def add_appointment_patient():
+    if request.method == "POST":
+        patient_id = request.form.get("patient_id")
+        staff_id = request.form.get("staff_id")
+        doctor_name = request.form.get("doctor_name")
+        date = request.form.get("date")
+        time = request.form.get("time")
+
+        # --- FIX: Convert empty staff_id "" → None ---
+        if not staff_id or staff_id.strip() == "":
+            staff_id = None
+        else:
+            staff_id = int(staff_id)
+
+        # --- Validate patient ---
+        if not patient_id or not patient_id.isdigit():
+            flash("Please select a valid patient.", "danger")
+            return redirect(url_for("add_appointment_patient"))
+
+        # --- Create appointment safely ---
+        appointment = Appointment(
+            patient_id=int(patient_id),
+            staff_id=staff_id,  # now safe for nullable integer
+            doctor_name=doctor_name,
+            date=datetime.strptime(date, "%Y-%m-%d").date(),
+            time=time,
+            status="Pending"
+        )
+
+        db.session.add(appointment)
+        db.session.commit()
+
+        flash("Appointment created!", "success")
+        return redirect(url_for("patient_appointments"))
+
+    # GET request
+    patients = Patient.query.all()
+    staff = Staff.query.all()
+    return render_template("add_appointment_patient.html", patients=patients, staff=staff)
+
+@app.route("/patient/appointments")
+def patient_appointments():
+    appointments = Appointment.query.all()
+    return render_template("appointments_patient.html", appointments=appointments)
+
+@app.route("/patient/appointments/edit/<int:appointment_id>", methods=["GET", "POST"])
+def edit_appointment_patient(appointment_id):
+    if session.get("role") not in ["viewer", "patient"]:
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    username = session.get("user")
+    patient = Patient.query.filter_by(username=username).first()
+    appointment = Appointment.query.get_or_404(appointment_id)
+    if appointment.patient_id != patient.id:
+        flash("You can only edit your own appointments.", "danger")
+        return redirect(url_for("view_appointments_patients"))
+    if request.method == "POST":
+        appointment.patient_id = request.form.get("patient_id")
+        appointment.staff_id = request.form.get("staff_id")
+        appointment.doctor_name = request.form.get("doctor_name")
+        appointment.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
+        appointment.time = request.form.get("time")
+        appointment.status = request.form.get("status")
+        db.session.commit()
+        flash("Appointment updated!", "success")
+        return redirect(url_for("view_appointments_patients"))
+    patients = Patient.query.all()
+    staff = Staff.query.all()
+    return render_template("edit_appointment_patient.html", appointment=appointment, patients=patients, staff=staff)
+
+@app.route("/patient/appointments/delete/<int:appointment_id>")
+def delete_appointment_patient(appointment_id):
+    if session.get("role") not in ["viewer", "patient"]:
+        flash("Access denied.", "danger")
+        return redirect(url_for("user_login"))
+    username = session.get("user")
+    patient = Patient.query.filter_by(username=username).first()
+    appointment = Appointment.query.get_or_404(appointment_id)
+    if appointment.patient_id != patient.id:
+        flash("You can only delete your own appointments.", "danger")
+        return redirect(url_for("view_appointments_patients"))
+    db.session.delete(appointment)
+    db.session.commit()
+    flash("Appointment deleted!", "success")
+    return redirect(url_for("view_appointments_patients"))
 
 # -----------------------
 # LOGOUT
