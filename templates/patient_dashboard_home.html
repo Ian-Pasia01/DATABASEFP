@@ -4,12 +4,10 @@
 
 {% block head %}
 <style>
-    /* Hide the main navigation header for admin dashboard */
     header {
         display: none !important;
     }
 
-    /* Adjust main content to take full height */
     main {
         padding: 0;
         margin: 0;
@@ -20,6 +18,7 @@
 
 {% block content %}
 <div class="admin-dashboard-container">
+
     <!-- SIDEBAR -->
     <aside class="admin-sidebar">
         <div class="sidebar-header">
@@ -27,10 +26,17 @@
         </div>
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="{{ url_for('patient_dashboard') }}" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="{{ url_for('view_appointments_patients') }}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
-                <li><a href="{{ url_for('patient_records') }}"><i class="fas fa-chart-bar"></i> Medical Records</a></li>
-                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="{{ url_for('patient_dashboard') }}" class="active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+
+                <li><a href="{{ url_for('patient_appointments_view') }}">
+                    <i class="fas fa-calendar-check"></i> Appointments</a></li>
+
+                <li><a href="{{ url_for('patient_records') }}">
+                    <i class="fas fa-chart-bar"></i> Medical Records</a></li>
+
+                <li><a href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
     </aside>
@@ -39,24 +45,51 @@
     <main class="admin-main-content">
         <header class="admin-header">
             <div class="header-content">
-                <h1 class="welcome-message">Admin Dashboard</h1>
-                <div class="admin-role-badge">Administrator</div>
+                <h1 class="welcome-message">Welcome, {{ patient.full_name }}</h1>
+                <div class="admin-role-badge">Patient</div>
             </div>
         </header>
-
-        
-            
     </main>
 </div>
 
-<!-- Flash Messages -->
+<!-- FLASH MESSAGES -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     <div class="flash-messages">
         {% for category, msg in messages %}
-        <div class="flash flash-{{ category }}">{{ msg }}</div>
+            <div class="flash flash-{{ category }}">{{ msg }}</div>
         {% endfor %}
     </div>
     {% endif %}
 {% endwith %}
 {% endblock %}
+                    <input type="text" id="searchInput" placeholder="Search patients..." onkeyup="filterPatients()" />
+                </div>
+
+                <table class="management-table" id="patientsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date of Birth</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in patients %}
+                        <tr>
+                            <td>{{ patient.id }}</td>
+                            <td>{{ patient.full_name }}</td>
+                            <td>{{ patient.email }}</td>
+                            <td>{{ patient.phone }}</td>
+                            <td>{{ patient.date_of_birth.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <a href="{{ url_for('view_patient_details', patient_id=patient.id) }}" class="btn-view-details">
+                                    <i class="fas fa-info-circle"></i> View Details
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
