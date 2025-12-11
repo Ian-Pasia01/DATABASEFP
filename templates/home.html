@@ -38,38 +38,75 @@
 <!-- SERVICES SECTION -->
 <section id="services">
         <div class="horizontal-scroll-container" id="scroll-container">
-            <div class="card" style="margin-left: 25px;">
-                <h3>Video/Audio Calls with Doctors</h3>
-                <p></p>
-            </div>
             <div class="card">
                 <h3>24/7 Availability</h3>
-                <p></p>
-            </div>
-            <div class="card">
-                <h3>Reminders & Notifications</h3>
-                <p></p>
+                <p>By using website based program we ensure to give 24/7 availaility to help everyone with their problem, questions and needs.</p>
             </div>
             <div class="card">
                 <h3>Prescription Services</h3>
-                <p></p>
+                <p>To ensure your safety and give quality services, our website provides prescription services to help everyone takes designated medicine </p>
+            </div>
+            <div class="card">
+                <h3>Reminders & Notifications</h3>
+                <p>To prevent missing the scheduled appointment, we provide reminders and notification to help everyone attend or do the designated task or appointments in time.</p>
+            </div>
+            <div class="card" style="margin-left: 25px;">
+                <h3>Video/Audio Calls with Doctors</h3>
+                <p>To ensure the clarity of information that our website gives we offer video/audio call with your doctors. This help the question and answer agenda when it comes to consulting to your doctors.</p>
             </div>
         </div>
-</section>
-
-<!-- ACHIEVEMENTS SECTION -->
-<section id="achievements">
-    <h2>Our Achievements</h2>
-    <h4>Our Numbers Speak For Themselves</h4>
-</section>
+</section>  
 
 <!-- PHOTOS SECTION -->
-<section id="gallery">
-    <img src="imgexample.jpeg" alt="Clinic Image 1">
-    <img src="imgexample.jpeg" alt="Clinic Image 2">
-    <img src="{{ url_for('static', filename='pictures/Doctor-removebg-preview.png') }}" alt="Doctor Image"/>
-    <img src="imgexample.jpeg" alt="Clinic Image 4">
-    <img src="imgexample.jpeg" alt="Clinic Image 5">
+<section id="announcement">
+    <h2 style="text-align: center;">Our Doctors</h2>
+    <div class="scroll-wrapper">
+        <div class="horizontal-scroll-container" id="scroll-container">
+            <div class="card">
+                <img src="static\pictures\Gemini_Generated_Image_nfedh4nfedh4nfed-removebg-preview.png" alt="Family Mediceine Doctor">
+                <p><strong>Doctor:</strong> Dr. Chen</p>
+            </div>
+
+            <div class="card">
+                <img src="static\pictures\Gemini_Generated_Image_8azl3s8azl3s8azl-removebg-preview.png" alt="Dental doctor">
+                <p><strong>Doctor:</strong> Dr. Singh</p>
+            </div>
+            <div class="card">
+                <img src="static\pictures\Gemini_Generated_Image_bcmjz4bcmjz4bcmj-removebg-preview.png" alt="Nurse"/>
+                <p><strong>Nurse:</strong> Sorriah David</p>
+            </div>
+            <div class="card">
+                <img src="static\pictures\Gemini_Generated_Image_5qer4t5qer4t5qer-removebg-preview.png" alt="Pediatrician Doctor">
+                <p><strong>Doctor:</strong> Dr. Lee</p>
+            </div>
+            <div class="card">
+                <img src="static\pictures\Gemini_Generated_Image_y4kbb8y4kbb8y4kb-removebg-preview.png" alt="Obstetrician-Gynecologist Doctor">
+                <p><strong>Doctor:</strong> Dr. Sella Macales</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('scroll-container');
+            const leftBtn = document.getElementById('left-btn');
+            const rightBtn = document.getElementById('right-btn');
+            const cardWidth = 910; 
+
+            leftBtn.addEventListener('click', function() {
+                container.scrollBy({
+                    left: -cardWidth,
+                    behavior: 'smooth'
+                });
+            });
+
+            rightBtn.addEventListener('click', function() {
+                container.scrollBy({
+                    left: cardWidth,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </section>
 
 <!-- DOCTORS SECTION -->
@@ -78,4 +115,12 @@
     <h4>Let's Meet With Expert Doctors</h4>
     <p>Let's meet with expert doctors who are ready to provide trusted care and accurate guidance.</p>
 </section>
+{% endblock %}
+
+{% block footer %}
+<footer style="display: flex;">
+    <p style="text-align: left; margin-left: 10px;">Email: carepoint@gmail.com</p>  
+    <p style="text-align: left; margin-left: 50px;">Facebook: CarePoint@facebook.com</p>
+    <p style="text-align: left; margin-left: 50px;">Contact Number: 961-356-7982</p>
+    <img  style="text-align: left; margin-left: 180px;" src="static\pictures\Gemini_Generated_Image_rtyxt1rtyxt1rtyx-removebg-preview.png" alt="CarePoint Logo" class="logo">
 {% endblock %}
