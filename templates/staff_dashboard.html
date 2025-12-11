@@ -50,6 +50,79 @@
                 <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
+        <!-- Sidebar widgets: Appointments + Medical Records (searchable) -->
+        <div class="sidebar-widgets">
+            <div class="sidebar-widget">
+                <h4><i class="fas fa-calendar-alt"></i> Your Appointments</h4>
+                <div class="sidebar-table-wrap">
+                    <table id="appointment-list" class="sidebar-table">
+                        <thead>
+                            <tr class="search-row">
+                                <th colspan="6">
+                                    <input id="appointment-search" class="sidebar-search in-table-search" type="text" placeholder="Search patient, date, or status..." />
+                                </th>
+                            </tr>
+                            <tr><th>ID</th><th>Patient</th><th>Date</th><th>Time</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        {% for appt in appointments[:12] %}
+                            <tr data-name="{{ appt.patient.full_name | lower }}" data-date="{{ appt.date.strftime('%Y-%m-%d') if appt.date else '' }}" data-status="{{ appt.status | lower }}">
+                                <td>{{ appt.id }}</td>
+                                <td>{{ appt.patient.full_name }}</td>
+                                <td>{{ appt.date.strftime('%Y-%m-%d') if appt.date else '' }}</td>
+                                <td>{{ appt.time }}</td>
+                                <td><span class="status-badge status-{{ appt.status.lower().replace(' ', '-') }}">{{ appt.status }}</span></td>
+                                <td class="sidebar-actions">
+                                    <form method="POST" action="{{ url_for('staff_update_appointment_status', appointment_id=appt.id) }}" class="inline-form">
+                                        <select name="status" class="small-select">
+                                            <option value="Pending" {% if appt.status=='Pending' %}selected{% endif %}>P</option>
+                                            <option value="In Progress" {% if appt.status=='In Progress' %}selected{% endif %}>IP</option>
+                                            <option value="Completed" {% if appt.status=='Completed' %}selected{% endif %}>C</option>
+                                        </select>
+                                        <button class="sidebar-action-btn" type="submit" title="Update">✎</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('staff_delete_appointment', appointment_id=appt.id) }}" onsubmit="return confirm('Delete this appointment?');" class="inline-form">
+                                        <button class="sidebar-action-btn delete" type="submit" title="Delete">🗑</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <h4><i class="fas fa-file-medical"></i> Medical Records</h4>
+                <div class="sidebar-table-wrap">
+                    <table id="record-list" class="sidebar-table">
+                        <thead>
+                            <tr class="search-row">
+                                <th colspan="4">
+                                    <input id="record-search" class="sidebar-search in-table-search" type="text" placeholder="Search patient or diagnosis..." />
+                                </th>
+                            </tr>
+                            <tr><th>Patient</th><th>Diag</th><th>Date</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        {% for rec in medical_records[:12] %}
+                            <tr data-name="{{ rec.patient.full_name | lower }}" data-diagnosis="{{ (rec.diagnosis or '') | lower }}">
+                                <td>{{ rec.patient.full_name }}</td>
+                                <td>{{ (rec.diagnosis[:24] ~ '...') if rec.diagnosis and rec.diagnosis|length>24 else (rec.diagnosis or 'N/A') }}</td>
+                                <td>{{ rec.record_date.strftime('%Y-%m-%d') if rec.record_date else '' }}</td>
+                                <td class="sidebar-actions">
+                                    <a href="{{ url_for('staff_edit_medical_record', record_id=rec.id) }}" class="sidebar-action-btn">✎</a>
+                                    <form method="POST" action="{{ url_for('staff_delete_medical_record', record_id=rec.id) }}" onsubmit="return confirm('Delete this record?');" class="inline-form">
+                                        <button class="sidebar-action-btn delete" type="submit">🗑</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </aside>
 
     <!-- MAIN CONTENT -->
