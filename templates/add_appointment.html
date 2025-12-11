@@ -400,7 +400,7 @@
                         <select name="staff_id" id="staff_id" class="form-select">
                             <option value="">Select staff member (optional)</option>
                             {% for member in staff %}
-                            <option value="{{ member.id }}">{{ member.name }} - {{ member.role }}</option>
+                            <option value="{{ member.id }}">{{ member.name }} ({{ member.role }}{% if member.specialization %}, {{ member.specialization }}{% endif %})</option>
                             {% endfor %}
                         </select>
                         <div class="form-help">Assign a staff member to handle this appointment</div>

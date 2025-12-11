@@ -203,6 +203,13 @@
                                 <td>{{ appt.date.strftime('%Y-%m-%d') }}</td>
                                 <td>{{ appt.time }}</td>
                                 <td>
+                                    {% if appt.staff %}
+                                        {{ appt.staff.name }} ({{ appt.staff.role }}{% if appt.staff.specialization %}, {{ appt.staff.specialization }}{% endif %})
+                                    {% else %}
+                                        {{ appt.doctor_name or 'N/A' }}
+                                    {% endif %}
+                                </td>
+                                <td>
                                     <span class="status-badge status-{{ appt.status.lower().replace(' ', '-') }}">
                                         {{ appt.status }}
                                     </span>

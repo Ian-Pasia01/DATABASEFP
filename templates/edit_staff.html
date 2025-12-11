@@ -76,6 +76,11 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="specialization"><i class="fas fa-user-md"></i> Specialization</label>
+                                <input type="text" id="specialization" name="specialization" value="{{ member.specialization or '' }}" required placeholder="e.g. Cardiology, Pediatrics, General, etc.">
+                            </div>
+
+                            <div class="form-group">
                                 <label for="role"><i class="fas fa-user-cog"></i> Role</label>
                                 <select id="role" name="role" required>
                                     <option value="doctor" {% if member.role == 'doctor' %}selected{% endif %}>Doctor</option>

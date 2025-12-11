@@ -71,7 +71,7 @@
                                 <select name="staff_id" id="staff_id" required>
                                     <option value="">Select Staff</option>
                                     {% for member in staff %}
-                                    <option value="{{ member.id }}" {% if member.id == appointment.staff_id %}selected{% endif %}>{{ member.name }} ({{ member.role }})</option>
+                                    <option value="{{ member.id }}" {% if member.id == appointment.staff_id %}selected{% endif %}>{{ member.name }} ({{ member.role }}{% if member.specialization %}, {{ member.specialization }}{% endif %})</option>
                                     {% endfor %}
                                 </select>
                             </div>

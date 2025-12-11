@@ -70,7 +70,13 @@
                         <tr>
                             <td>{{ appointment.id }}</td>
                             <td>{{ appointment.patient.full_name if appointment.patient else 'N/A' }}</td>
-                            <td>{{ appointment.doctor_name or 'N/A' }}</td>
+                            <td>
+                                {% if appointment.staff %}
+                                    {{ appointment.staff.name }} ({{ appointment.staff.role }}{% if appointment.staff.specialization %}, {{ appointment.staff.specialization }}{% endif %})
+                                {% else %}
+                                    {{ appointment.doctor_name or 'N/A' }}
+                                {% endif %}
+                            </td>
                             <td>{{ appointment.date.strftime('%Y-%m-%d') if appointment.date else 'N/A' }}</td>
                             <td>{{ appointment.time }}</td>
                             <td>

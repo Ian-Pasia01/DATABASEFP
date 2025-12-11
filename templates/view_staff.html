@@ -59,6 +59,7 @@ header {
                                 <th><i class="fas fa-user"></i> Username</th>
                                 <th><i class="fas fa-id-card"></i> Full Name</th>
                                 <th><i class="fas fa-briefcase"></i> Role</th>
+                                <th><i class="fas fa-stethoscope"></i> Specialization</th>
                                 <th><i class="fas fa-envelope"></i> Email</th>
                                 <th><i class="fas fa-phone"></i> Phone</th>
                                 <th><i class="fas fa-cogs"></i> Actions</th>
@@ -75,6 +76,7 @@ header {
                                             {{ member.role|title if member.role else 'Admin' }}
                                         </span>
                                     </td>
+                                    <td>{{ member.specialization if member.specialization else '-' }}</td>
                                     <td>{{ member.email if member.email else '-' }}</td>
                                     <td>{{ member.phone_number if member.phone_number else '-' }}</td>
                                     <td>

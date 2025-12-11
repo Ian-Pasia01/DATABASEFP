@@ -48,11 +48,12 @@ class Staff(db.Model):
     phone_number = db.Column(db.String(20), nullable=True)
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), default="staff")  # e.g., 'doctor', 'nurse', etc.
+    specialization = db.Column(db.String(100), nullable=True)  # e.g., 'Cardiology', 'Pediatrics', etc.
 
     appointments = db.relationship('Appointment', backref='staff', lazy=True)
 
     def __repr__(self):
-        return f"<Staff {self.name}>"
+        return f"<Staff {self.name} - {self.specialization}>"
 
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
