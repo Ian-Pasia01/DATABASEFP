@@ -50,7 +50,10 @@ class Staff(db.Model):
     role = db.Column(db.String(20), default="staff")  # e.g., 'doctor', 'nurse', etc.
     specialization = db.Column(db.String(100), nullable=True)  # e.g., 'Cardiology', 'Pediatrics', etc.
 
-    appointments = db.relationship('Appointment', backref='staff', lazy=True)
+    # Relationship for appointments where this staff is the doctor
+    appointments = db.relationship('Appointment', foreign_keys='Appointment.doctor_id', backref='doctor', lazy=True)
+    # Relationship for appointments where this staff is additional staff (nurse)
+    additional_appointments = db.relationship('Appointment', foreign_keys='Appointment.staff_id', backref='additional_staff', lazy=True)
 
     def __repr__(self):
         return f"<Staff {self.name} - {self.specialization}>"
@@ -58,7 +61,8 @@ class Staff(db.Model):
 class Appointment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'), nullable=False)
-    staff_id = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=True)
+    doctor_id = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=False)  # Primary doctor assigned to appointment
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff.id'), nullable=True)  # Additional staff (nurse)
     doctor_name = db.Column(db.String(120), nullable=False)
     date = db.Column(db.Date, nullable=False)
     time = db.Column(db.String(20), nullable=False)

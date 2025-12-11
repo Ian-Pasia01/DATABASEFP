@@ -50,79 +50,6 @@
                 <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
-        <!-- Sidebar widgets: Appointments + Medical Records (searchable) -->
-        <div class="sidebar-widgets">
-            <div class="sidebar-widget">
-                <h4><i class="fas fa-calendar-alt"></i> Your Appointments</h4>
-                <div class="sidebar-table-wrap">
-                    <table id="appointment-list" class="sidebar-table">
-                        <thead>
-                            <tr class="search-row">
-                                <th colspan="6">
-                                    <input id="appointment-search" class="sidebar-search in-table-search" type="text" placeholder="Search patient, date, or status..." />
-                                </th>
-                            </tr>
-                            <tr><th>ID</th><th>Patient</th><th>Date</th><th>Time</th><th>Status</th><th></th></tr>
-                        </thead>
-                        <tbody>
-                        {% for appt in appointments[:12] %}
-                            <tr data-name="{{ appt.patient.full_name | lower }}" data-date="{{ appt.date.strftime('%Y-%m-%d') if appt.date else '' }}" data-status="{{ appt.status | lower }}">
-                                <td>{{ appt.id }}</td>
-                                <td>{{ appt.patient.full_name }}</td>
-                                <td>{{ appt.date.strftime('%Y-%m-%d') if appt.date else '' }}</td>
-                                <td>{{ appt.time }}</td>
-                                <td><span class="status-badge status-{{ appt.status.lower().replace(' ', '-') }}">{{ appt.status }}</span></td>
-                                <td class="sidebar-actions">
-                                    <form method="POST" action="{{ url_for('staff_update_appointment_status', appointment_id=appt.id) }}" class="inline-form">
-                                        <select name="status" class="small-select">
-                                            <option value="Pending" {% if appt.status=='Pending' %}selected{% endif %}>P</option>
-                                            <option value="In Progress" {% if appt.status=='In Progress' %}selected{% endif %}>IP</option>
-                                            <option value="Completed" {% if appt.status=='Completed' %}selected{% endif %}>C</option>
-                                        </select>
-                                        <button class="sidebar-action-btn" type="submit" title="Update">✎</button>
-                                    </form>
-                                    <form method="POST" action="{{ url_for('staff_delete_appointment', appointment_id=appt.id) }}" onsubmit="return confirm('Delete this appointment?');" class="inline-form">
-                                        <button class="sidebar-action-btn delete" type="submit" title="Delete">🗑</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="sidebar-widget">
-                <h4><i class="fas fa-file-medical"></i> Medical Records</h4>
-                <div class="sidebar-table-wrap">
-                    <table id="record-list" class="sidebar-table">
-                        <thead>
-                            <tr class="search-row">
-                                <th colspan="4">
-                                    <input id="record-search" class="sidebar-search in-table-search" type="text" placeholder="Search patient or diagnosis..." />
-                                </th>
-                            </tr>
-                            <tr><th>Patient</th><th>Diag</th><th>Date</th><th></th></tr>
-                        </thead>
-                        <tbody>
-                        {% for rec in medical_records[:12] %}
-                            <tr data-name="{{ rec.patient.full_name | lower }}" data-diagnosis="{{ (rec.diagnosis or '') | lower }}">
-                                <td>{{ rec.patient.full_name }}</td>
-                                <td>{{ (rec.diagnosis[:24] ~ '...') if rec.diagnosis and rec.diagnosis|length>24 else (rec.diagnosis or 'N/A') }}</td>
-                                <td>{{ rec.record_date.strftime('%Y-%m-%d') if rec.record_date else '' }}</td>
-                                <td class="sidebar-actions">
-                                    <a href="{{ url_for('staff_edit_medical_record', record_id=rec.id) }}" class="sidebar-action-btn">✎</a>
-                                    <form method="POST" action="{{ url_for('staff_delete_medical_record', record_id=rec.id) }}" onsubmit="return confirm('Delete this record?');" class="inline-form">
-                                        <button class="sidebar-action-btn delete" type="submit">🗑</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </aside>
 
     <!-- MAIN CONTENT -->
@@ -137,6 +64,19 @@
         </div>
 
         <div class="admin-body dashboard-content-wrapper">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                    <div class="flash flash-{{ category }}">
+                        {{ msg }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+
             <!-- Stats Cards -->
             <section class="stats-section">
                 <div class="stats-cards">
@@ -186,33 +126,56 @@
                 </div>
 
                 {% if appointments %}
+                <!-- Search Bar -->
+                <div class="search-container" style="margin-bottom: 20px;">
+                    <input type="text" id="appointmentTableSearch" placeholder="Search by patient name, doctor name, date, or status..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s;">
+                </div>
+
                 <div class="table-container">
-                    <table class="appointments-table">
+                    <table class="appointments-table" id="staffAppointmentTable">
                         <thead>
                             <tr>
                                 <th><i class="fas fa-user"></i> Patient</th>
+                                <th><i class="fas fa-user-md"></i> Doctor</th>
                                 <th><i class="fas fa-calendar"></i> Date</th>
                                 <th><i class="fas fa-clock"></i> Time</th>
                                 <th><i class="fas fa-info-circle"></i> Status</th>
+                                <th><i class="fas fa-cogs"></i> Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for appt in appointments %}
                             <tr class="appointment-row">
                                 <td>{{ appt.patient.full_name }}</td>
-                                <td>{{ appt.date.strftime('%Y-%m-%d') }}</td>
-                                <td>{{ appt.time }}</td>
                                 <td>
-                                    {% if appt.staff %}
-                                        {{ appt.staff.name }} ({{ appt.staff.role }}{% if appt.staff.specialization %}, {{ appt.staff.specialization }}{% endif %})
+                                    {% if appt.doctor %}
+                                        {{ appt.doctor.name }} ({{ appt.doctor.role }}{% if appt.doctor.specialization %}, {{ appt.doctor.specialization }}{% endif %})
                                     {% else %}
                                         {{ appt.doctor_name or 'N/A' }}
                                     {% endif %}
                                 </td>
+                                <td>{{ appt.date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ appt.time }}</td>
                                 <td>
-                                    <span class="status-badge status-{{ appt.status.lower().replace(' ', '-') }}">
-                                        {{ appt.status }}
-                                    </span>
+                                    <form method="POST" action="{{ url_for('staff_update_appointment_status', appointment_id=appt.id) }}" style="display: inline;">
+                                        <select name="status" class="status-select" onchange="this.form.submit();">
+                                            <option value="Pending" {% if appt.status=='Pending' %}selected{% endif %}>Pending</option>
+                                            <option value="In Progress" {% if appt.status=='In Progress' %}selected{% endif %}>In Progress</option>
+                                            <option value="Completed" {% if appt.status=='Completed' %}selected{% endif %}>Completed</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{{ url_for('edit_appointment', appointment_id=appt.id) }}" class="btn-edit" title="Edit Appointment">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <form method="POST" action="{{ url_for('staff_delete_appointment', appointment_id=appt.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this appointment?');">
+                                            <button type="submit" class="btn-delete" title="Delete Appointment">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -237,8 +200,13 @@
                 </div>
 
                 {% if medical_records %}
+                <!-- Search Bar -->
+                <div class="search-container" style="margin-bottom: 20px;">
+                    <input type="text" id="medicalRecordSearch" placeholder="Search by patient name, diagnosis, or prescription..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s;">
+                </div>
+
                 <div class="table-container">
-                    <table class="appointments-table">
+                    <table class="appointments-table" id="staffMedicalTable">
                         <thead>
                             <tr>
                                 <th><i class="fas fa-user"></i> Patient</th>
@@ -352,6 +320,46 @@ document.addEventListener('DOMContentLoaded', function () {
     if (recSearch) {
         recSearch.addEventListener('input', function () {
             filterList(recSearch, recList, ['data-name', 'data-diagnosis']);
+        });
+    }
+
+    // Search functionality for main appointment table
+    const appointmentTableSearch = document.getElementById('appointmentTableSearch');
+    const staffAppointmentTable = document.getElementById('staffAppointmentTable');
+    
+    if (appointmentTableSearch && staffAppointmentTable) {
+        appointmentTableSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = staffAppointmentTable.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Search functionality for medical records table
+    const medicalRecordSearch = document.getElementById('medicalRecordSearch');
+    const staffMedicalTable = document.getElementById('staffMedicalTable');
+    
+    if (medicalRecordSearch && staffMedicalTable) {
+        medicalRecordSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = staffMedicalTable.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         });
     }
 });

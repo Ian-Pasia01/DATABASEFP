@@ -152,12 +152,12 @@ def add_appointment():
         doctor = Staff.query.get_or_404(doctor_id)
         doctor_name = doctor.name
 
-        # --- FIX: Assign doctor as responsible staff member (doctor_id → staff_id) ---
-        # If no additional staff assigned, use the doctor as the staff_id
-        if not staff_id or staff_id.strip() == "":
-            staff_id = int(doctor_id)  # Doctor is assigned by default
+        # --- Handle additional staff assignment ---
+        # Additional staff (nurse) is optional
+        if not staff_id or (isinstance(staff_id, str) and staff_id.strip() == ""):
+            staff_id = None
         else:
-            staff_id = int(staff_id)
+            staff_id = int(staff_id) if staff_id else None
 
         # --- Validate patient ---
         if not patient_id or not patient_id.isdigit():
@@ -167,7 +167,8 @@ def add_appointment():
         # --- Create appointment safely ---
         appointment = Appointment(
             patient_id=int(patient_id),
-            staff_id=staff_id,  # Doctor is assigned as responsible staff
+            doctor_id=int(doctor_id),
+            staff_id=staff_id,
             doctor_name=doctor_name,
             date=datetime.strptime(date, "%Y-%m-%d").date(),
             time=time,
@@ -183,8 +184,9 @@ def add_appointment():
     # GET request
     patients = Patient.query.all()
     doctors = Staff.query.filter_by(role="doctor").all()
-    staff = Staff.query.all()
-    return render_template("add_appointment.html", patients=patients, doctors=doctors, staff=staff)
+    # Only fetch nurses for additional staff assignment
+    nurses = Staff.query.filter_by(role="nurse").all()
+    return render_template("add_appointment.html", patients=patients, doctors=doctors, staff=nurses)
 
 
 @app.route("/admin/appointments/edit/<int:appointment_id>", methods=["GET", "POST"])
@@ -199,14 +201,15 @@ def edit_appointment(appointment_id):
         # Get doctor from selected doctor_id
         doctor_id = request.form.get("doctor_id")
         doctor = Staff.query.get_or_404(doctor_id)
+        appointment.doctor_id = int(doctor_id)
         appointment.doctor_name = doctor.name
         
-        # Assign doctor as responsible staff member (doctor_id → staff_id)
+        # Handle additional staff (optional)
         staff_id = request.form.get("staff_id")
-        if not staff_id or staff_id.strip() == "":
-            appointment.staff_id = int(doctor_id)  # Doctor is assigned by default
+        if not staff_id or (isinstance(staff_id, str) and staff_id.strip() == ""):
+            appointment.staff_id = None
         else:
-            appointment.staff_id = int(staff_id)
+            appointment.staff_id = int(staff_id) if staff_id else None
         
         appointment.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
         appointment.time = request.form.get("time")
@@ -216,8 +219,9 @@ def edit_appointment(appointment_id):
         return redirect(url_for("view_appointments"))
     patients = Patient.query.all()
     doctors = Staff.query.filter_by(role="doctor").all()
-    staff = Staff.query.all()
-    return render_template("edit_appointment.html", appointment=appointment, patients=patients, doctors=doctors, staff=staff)
+    # Only fetch nurses for additional staff assignment
+    nurses = Staff.query.filter_by(role="nurse").all()
+    return render_template("edit_appointment.html", appointment=appointment, patients=patients, doctors=doctors, staff=nurses)
 
 @app.route("/admin/appointments/delete/<int:appointment_id>")
 def delete_appointment(appointment_id):
@@ -350,33 +354,46 @@ def add_patient_appointment():
         appt_date = request.form.get("date")
         appt_time = request.form.get("time")
         
+        # Verify patient still exists before creating appointment
+        patient = Patient.query.get(patient.id)
+        if not patient:
+            flash("Patient record not found.", "danger")
+            return redirect(url_for("user_login"))
+        
         # Get doctor information from selected doctor
         doctor = Staff.query.get_or_404(doctor_id)
         doctor_name = doctor.name
         
         # Handle nullable staff_id (for additional staff assignment)
-        if not staff_id or staff_id.strip() == "":
+        if not staff_id or (isinstance(staff_id, str) and staff_id.strip() == ""):
             staff_id = None
         else:
-            staff_id = int(staff_id)
+            staff_id = int(staff_id) if staff_id else None
         
-        appointment = Appointment(
-            patient_id=patient.id,
-            staff_id=staff_id,
-            doctor_name=doctor_name,
-            date=datetime.strptime(appt_date, "%Y-%m-%d").date(),
-            time=appt_time,
-            status="Pending"
-        )
-        db.session.add(appointment)
-        db.session.commit()
-        flash("Appointment request submitted!", "success")
-        return redirect(url_for("patient_appointments"))
+        try:
+            appointment = Appointment(
+                patient_id=patient.id,
+                doctor_id=int(doctor_id),
+                staff_id=staff_id,
+                doctor_name=doctor_name,
+                date=datetime.strptime(appt_date, "%Y-%m-%d").date(),
+                time=appt_time,
+                status="Pending"
+            )
+            db.session.add(appointment)
+            db.session.commit()
+            flash("Appointment request submitted!", "success")
+            return redirect(url_for("patient_appointments"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error creating appointment: {str(e)}", "danger")
+            return redirect(url_for("add_patient_appointment"))
     
     # Get doctors (staff with role 'doctor')
     doctors = Staff.query.filter_by(role="doctor").all()
-    staff = Staff.query.all()
-    return render_template("add_appointment_patient.html", doctors=doctors, staff=staff)
+    # Get only nurses for additional staff assignment
+    nurses = Staff.query.filter_by(role="nurse").all()
+    return render_template("add_appointment_patient.html", doctors=doctors, staff=nurses)
 
 @app.route("/patient/appointments/edit/<int:appointment_id>", methods=["GET", "POST"])
 def edit_patient_appointment(appointment_id):
@@ -399,22 +416,29 @@ def edit_patient_appointment(appointment_id):
         
         # Get doctor information from selected doctor
         doctor = Staff.query.get_or_404(doctor_id)
+        appointment.doctor_id = int(doctor_id)
         appointment.doctor_name = doctor.name
         
-        if not staff_id or staff_id.strip() == "":
+        if not staff_id or (isinstance(staff_id, str) and staff_id.strip() == ""):
             appointment.staff_id = None
         else:
-            appointment.staff_id = int(staff_id)
+            appointment.staff_id = int(staff_id) if staff_id else None
         
-        appointment.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
-        appointment.time = request.form.get("time")
-        db.session.commit()
-        flash("Appointment updated!", "success")
-        return redirect(url_for("patient_appointments"))
+        try:
+            appointment.date = datetime.strptime(request.form.get("date"), "%Y-%m-%d").date()
+            appointment.time = request.form.get("time")
+            db.session.commit()
+            flash("Appointment updated!", "success")
+            return redirect(url_for("patient_appointments"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error updating appointment: {str(e)}", "danger")
+            return redirect(url_for("edit_patient_appointment", appointment_id=appointment_id))
     
     doctors = Staff.query.filter_by(role="doctor").all()
-    staff = Staff.query.all()
-    return render_template("edit_appointment_patient.html", appointment=appointment, doctors=doctors, staff=staff)
+    # Get only nurses for additional staff assignment
+    nurses = Staff.query.filter_by(role="nurse").all()
+    return render_template("edit_appointment_patient.html", appointment=appointment, doctors=doctors, staff=nurses)
 
 @app.route("/patient/appointments/delete/<int:appointment_id>")
 def delete_patient_appointment(appointment_id):
@@ -476,7 +500,14 @@ def staff_dashboard():
         return redirect(url_for("staff_login"))
     staff_id = session.get("staff_id")
     staff_member = Staff.query.get_or_404(staff_id)
-    appointments = Appointment.query.filter_by(staff_id=staff_id).all()
+    
+    # Get appointments based on staff role
+    if staff_member.role == "doctor":
+        # Doctors see appointments where they are the primary doctor
+        appointments = Appointment.query.filter_by(doctor_id=staff_id).all()
+    else:  # nurse or other roles
+        # Nurses see appointments where they are assigned as additional staff
+        appointments = Appointment.query.filter_by(staff_id=staff_id).all()
     
     # Get unique patients for this staff member from their appointments
     patient_ids = [appt.patient_id for appt in appointments]
@@ -494,8 +525,16 @@ def staff_update_appointment_status(appointment_id):
         flash('Access denied.', 'danger')
         return redirect(url_for('staff_login'))
     staff_id = session.get('staff_id')
+    staff_member = Staff.query.get_or_404(staff_id)
     appointment = Appointment.query.get_or_404(appointment_id)
-    if appointment.staff_id != staff_id:
+    # Check if staff is the doctor or assigned nurse
+    has_access = False
+    if staff_member.role == "doctor" and appointment.doctor_id == staff_id:
+        has_access = True
+    elif staff_member.role != "doctor" and appointment.staff_id == staff_id:
+        has_access = True
+    
+    if not has_access:
         flash("You don't have permission to modify this appointment.", 'danger')
         return redirect(url_for('staff_dashboard'))
     # only allow updating status (and optional date/time if provided)
@@ -523,8 +562,16 @@ def staff_delete_appointment(appointment_id):
         flash('Access denied.', 'danger')
         return redirect(url_for('staff_login'))
     staff_id = session.get('staff_id')
+    staff_member = Staff.query.get_or_404(staff_id)
     appointment = Appointment.query.get_or_404(appointment_id)
-    if appointment.staff_id != staff_id:
+    # Check if staff is the doctor or assigned nurse
+    has_access = False
+    if staff_member.role == "doctor" and appointment.doctor_id == staff_id:
+        has_access = True
+    elif staff_member.role != "doctor" and appointment.staff_id == staff_id:
+        has_access = True
+    
+    if not has_access:
         flash("You don't have permission to delete this appointment.", 'danger')
         return redirect(url_for('staff_dashboard'))
     db.session.delete(appointment)
@@ -542,9 +589,16 @@ def staff_add_medical_record(patient_id):
         return redirect(url_for("staff_login"))
     
     staff_id = session.get("staff_id")
+    staff_member = Staff.query.get_or_404(staff_id)
     
-    # Verify this patient is assigned to this staff member
-    appointment = Appointment.query.filter_by(patient_id=patient_id, staff_id=staff_id).first()
+    # Only doctors can add medical records
+    if staff_member.role != "doctor":
+        flash("Only doctors can add medical records.", "danger")
+        return redirect(url_for("staff_dashboard"))
+    
+    # Verify this patient is assigned to this doctor
+    appointment = Appointment.query.filter_by(patient_id=patient_id, doctor_id=staff_id).first()
+    
     if not appointment:
         flash("You don't have access to this patient.", "danger")
         return redirect(url_for("staff_dashboard"))
@@ -578,10 +632,17 @@ def staff_edit_medical_record(record_id):
         return redirect(url_for("staff_login"))
     
     staff_id = session.get("staff_id")
+    staff_member = Staff.query.get_or_404(staff_id)
     medical_record = MedicalRecord.query.get_or_404(record_id)
     
-    # Verify this patient is assigned to this staff member
-    appointment = Appointment.query.filter_by(patient_id=medical_record.patient_id, staff_id=staff_id).first()
+    # Only doctors can edit medical records
+    if staff_member.role != "doctor":
+        flash("Only doctors can edit medical records.", "danger")
+        return redirect(url_for("staff_dashboard"))
+    
+    # Verify this patient is assigned to this doctor
+    appointment = Appointment.query.filter_by(patient_id=medical_record.patient_id, doctor_id=staff_id).first()
+    
     if not appointment:
         flash("You don't have access to this record.", "danger")
         return redirect(url_for("staff_dashboard"))
@@ -607,10 +668,17 @@ def staff_delete_medical_record(record_id):
         return redirect(url_for("staff_login"))
     
     staff_id = session.get("staff_id")
+    staff_member = Staff.query.get_or_404(staff_id)
     medical_record = MedicalRecord.query.get_or_404(record_id)
     
-    # Verify this patient is assigned to this staff member
-    appointment = Appointment.query.filter_by(patient_id=medical_record.patient_id, staff_id=staff_id).first()
+    # Only doctors can delete medical records
+    if staff_member.role != "doctor":
+        flash("Only doctors can delete medical records.", "danger")
+        return redirect(url_for("staff_dashboard"))
+    
+    # Verify this patient is assigned to this doctor
+    appointment = Appointment.query.filter_by(patient_id=medical_record.patient_id, doctor_id=staff_id).first()
+    
     if not appointment:
         flash("You don't have access to this record.", "danger")
         return redirect(url_for("staff_dashboard"))
@@ -654,6 +722,7 @@ def add_staff():
         phone_number = request.form.get("phone")  # match form input name
         password = request.form.get("password")
         role = request.form.get("role")
+        specialization = request.form.get("specialization")
 
         # Check if username exists
         existing_staff = Staff.query.filter_by(username=username).first()
@@ -674,7 +743,8 @@ def add_staff():
             email=email,
             phone_number=phone_number,  # <-- use phone_number here
             password=generate_password_hash(password),
-            role=role
+            role=role,
+            specialization=specialization
         )
         db.session.add(new_staff)
         db.session.commit()
@@ -701,6 +771,7 @@ def edit_staff(staff_id):
         staff_member.email = request.form.get("email")  # optional
         staff_member.phone_number = request.form.get("phone_number")  # matches form 'name'
         staff_member.role = request.form.get("role")
+        staff_member.specialization = request.form.get("specialization")
 
         # Update password only if a new one is provided
         password = request.form.get("password")

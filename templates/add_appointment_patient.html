@@ -360,21 +360,21 @@
                             <select name="doctor_id" id="doctor_id" class="form-select" required>
                                 <option value="">Select a doctor</option>
                                 {% for doctor in doctors %}
-                                <option value="{{ doctor.id }}">{{ doctor.name }}</option>
+                                <option value="{{ doctor.id }}">{{ doctor.name }} - {{ doctor.specialization or 'General' }}</option>
                                 {% endfor %}
                             </select>
                             <div class="form-help">Select the doctor for this appointment</div>
                         </div>
 
                         <div class="form-group">
-                            <label for="staff_id">Assign Additional Staff</label>
+                            <label for="staff_id">Assign Additional Nurse</label>
                             <select name="staff_id" id="staff_id" class="form-select">
-                                <option value="">Select staff member (optional)</option>
+                                <option value="">Select nurse (optional)</option>
                                 {% for member in staff %}
-                                <option value="{{ member.id }}">{{ member.name }} - {{ member.role }}</option>
+                                <option value="{{ member.id }}">{{ member.name }} - {{ member.specialization or 'General' }}</option>
                                 {% endfor %}
                             </select>
-                            <div class="form-help">Assign additional staff to handle this appointment</div>
+                            <div class="form-help">Assign an additional nurse to assist with this appointment</div>
                         </div>
                     </div>
 

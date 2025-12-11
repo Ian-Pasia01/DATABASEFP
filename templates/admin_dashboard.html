@@ -114,6 +114,7 @@
                                 <th><i class="fas fa-id-badge"></i> ID</th>
                                 <th><i class="fas fa-user"></i> Name</th>
                                 <th><i class="fas fa-briefcase"></i> Role</th>
+                                <th><i class="fas fa-stethoscope"></i> Specialization</th>
                                 <th><i class="fas fa-envelope"></i> Email</th>
                                 <th><i class="fas fa-phone"></i> Phone</th>
                                 <th><i class="fas fa-cogs"></i> Actions</th>
@@ -129,6 +130,7 @@
                                         {{ member.role | capitalize }}
                                     </span>
                                 </td>
+                                <td>{{ member.specialization or 'N/A' }}</td>
                                 <td>{{ member.email or 'N/A' }}</td>
                                 <td>{{ member.phone_number or 'N/A' }}</td>
                                 <td>

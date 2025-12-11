@@ -25,7 +25,7 @@ header {
                 <li><a href="{{ url_for('view_staff') }}" class="active"><i class="fas fa-user-md"></i> Staff</a></li>
                 <li><a href="{{ url_for('admin_reports') }}"><i class="fas fa-chart-bar"></i> Reports</a></li>
             
-                <li><a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
     </aside>
@@ -51,8 +51,13 @@ header {
                     </a>
                 </div>
 
+                <!-- Search Bar -->
+                <div class="search-container" style="margin-bottom: 20px;">
+                    <input type="text" id="staffSearch" placeholder="Search staff by name, username, email, role, or specialization..." style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s;">
+                </div>
+
                 <div class="table-container">
-                    <table class="management-table">
+                    <table class="management-table" id="staffTable">
                         <thead>
                             <tr>
                                 <th><i class="fas fa-hashtag"></i> ID</th>
@@ -109,4 +114,28 @@ header {
         </div>
     </main>
 </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    // Search functionality for staff table
+    const staffSearch = document.getElementById('staffSearch');
+    const staffTable = document.getElementById('staffTable');
+    
+    if (staffSearch && staffTable) {
+        staffSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = staffTable.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+</script>
 {% endblock %}

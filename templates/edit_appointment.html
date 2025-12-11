@@ -67,11 +67,11 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="staff_id"><i class="fas fa-user-md"></i> Assign Staff</label>
-                                <select name="staff_id" id="staff_id" required>
-                                    <option value="">Select Staff</option>
+                                <label for="staff_id"><i class="fas fa-user-md"></i> Assign Additional Nurse</label>
+                                <select name="staff_id" id="staff_id">
+                                    <option value="">Select Nurse (optional)</option>
                                     {% for member in staff %}
-                                    <option value="{{ member.id }}" {% if member.id == appointment.staff_id %}selected{% endif %}>{{ member.name }} ({{ member.role }}{% if member.specialization %}, {{ member.specialization }}{% endif %})</option>
+                                    <option value="{{ member.id }}" {% if member.id == appointment.staff_id %}selected{% endif %}>{{ member.name }}{% if member.specialization %} - {{ member.specialization }}{% endif %}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -81,7 +81,7 @@
                                 <select name="doctor_id" id="doctor_id" required>
                                     <option value="">Select a doctor</option>
                                     {% for doctor in doctors %}
-                                    <option value="{{ doctor.id }}" {% if doctor.name == appointment.doctor_name %}selected{% endif %}>{{ doctor.name }}</option>
+                                    <option value="{{ doctor.id }}" {% if doctor.name == appointment.doctor_name %}selected{% endif %}>{{ doctor.name }}{% if doctor.specialization %} - {{ doctor.specialization }}{% endif %}</option>
                                     {% endfor %}
                                 </select>
                             </div>
