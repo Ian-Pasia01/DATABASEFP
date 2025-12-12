@@ -3,7 +3,7 @@ from datetime import datetime, date
 from flask import Flask, render_template, redirect, url_for, session, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from models import db, User, Patient, Admin, Staff, Appointment, MedicalRecord
+from models import db, Patient, Staff, Appointment, MedicalRecord
 from form import LoginForm, AdminLog, StaffLoginForm
 
 # -----------------------
@@ -42,7 +42,7 @@ def announcement():
 def admin_login():
     form = AdminLog()
     if form.validate_on_submit():
-        admin = User.query.filter_by(username=form.AdminUser.data, role='admin').first()
+        admin = Staff.query.filter_by(username=form.AdminUser.data, role='admin').first()
         if admin and check_password_hash(admin.password, form.passw.data):
             session['user'] = admin.username
             session['role'] = 'admin'
@@ -295,12 +295,6 @@ def user_login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        admin = User.query.filter_by(username=username, role='admin').first()
-        if admin and check_password_hash(admin.password, password):
-            session["user"] = admin.username
-            session["role"] = "admin"
-            flash("Admin login successful!", "success")
-            return redirect(url_for("admin_dashboard"))
         patient = Patient.query.filter_by(username=username).first()
         if patient and check_password_hash(patient.password, password):
             session["user"] = patient.username
@@ -486,10 +480,15 @@ def staff_login():
         staff = Staff.query.filter_by(username=form.username.data).first()
         if staff and check_password_hash(staff.password, form.password.data):
             session['user'] = staff.username
-            session['role'] = 'staff'
             session['staff_id'] = staff.id
-            flash("Staff login successful!", "success")
-            return redirect(url_for('staff_dashboard'))
+            if staff.role == 'admin':
+                session['role'] = 'admin'
+                flash("Admin login successful!", "success")
+                return redirect(url_for('admin_dashboard'))
+            else:
+                session['role'] = 'staff'
+                flash("Staff login successful!", "success")
+                return redirect(url_for('staff_dashboard'))
         flash("Invalid staff credentials", "danger")
     return render_template("staff_login.html", form=form)
 
@@ -819,9 +818,10 @@ def delete_staff(staff_id):
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-        if not User.query.filter_by(username='admin').first():
-            admin_user = User(
+        if not Staff.query.filter_by(username='admin').first():
+            admin_user = Staff(
                 username='admin',
+                name='Administrator',
                 password=generate_password_hash('admin01'),
                 role='admin'
             )

@@ -5,13 +5,6 @@ db = SQLAlchemy()
 
 
 
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(10), nullable=False)
-
 class Patient(db.Model):
     __tablename__ = "patient"
 
@@ -35,10 +28,7 @@ class Patient(db.Model):
         return f"<Patient {self.full_name}>"
 
 
-class Admin(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(125), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+
 
 class Staff(db.Model):
     id = db.Column(db.Integer, primary_key=True)
