@@ -1,0 +1,30 @@
+id,patient_id,diagnosis,prescription,lab_result,record_date
+4,11,Acute Periapical Abscess,"Amoxicillin or clindamycin (if allergic)
+NSAID for pain
+Warm saline rinses",N/A,2025-12-12 14:58:35.555347
+5,17,Chronic Periodontitis (Moderate),"hlorhexidine mouth rinse (short-term)
+Scaling & root planing (SRP)
+Periodontal maintenance every 3–4 months","Periodontal charting: probing depths 5–6 mm
+Radiograph: horizontal bone loss 30–40%",2025-12-12 15:04:03.676495
+6,21,Oral Candidiasis,"opical antifungal (e.g., nystatin rinse)
+Address risk factors (xerostomia, dentures, recent antibiotics)",KOH smear: budding yeast & pseudohyphae,2025-12-12 15:05:19.126909
+7,20,Acute Bacterial Sinusitis,"Amoxicillin–clavulanate
+
+Saline nasal rinse
+
+NSAID for facial pressure/headache",N/A,2025-12-12 15:17:33.630406
+8,20,Type 2 Diabetes Mellitus,"Metformin
+
+Lifestyle modification (diet, exercise)
+
+Recommend diabetic foot/eye exam referral","Fasting Blood Glucose: 162 mg/dL
+
+HbA1c: 7.6%",2025-12-12 15:18:59.052211
+9,22,Viral Gastroenteritis,"Oral rehydration solution (ORS)
+Antipyretic for fever
+Avoid antidiarrheals in young children
+Encourage small, frequent fluids",N/A,2025-12-12 15:30:42.783769
+10,9,Streptococcal Pharyngitis,"Penicillin or amoxicillin
+Hydration and rest
+Analgesic for throat pain","Rapid Strep Test: Positive
+Throat culture: optional but may confirm positive result",2025-12-12 15:42:53.544367

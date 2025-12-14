@@ -1,0 +1,21 @@
+id,patient_id,doctor_id,staff_id,doctor_name,date,time,status
+26,17,8,22,Adelantar David Lee,2025-12-10 00:00:00,12:00,Completed
+27,16,12,20,Sarah Ibrahim,2026-01-14 00:00:00,08:00,Pending
+29,21,8,6,Adelantar David Lee,2026-02-06 00:00:00,08:00,Cancelled
+30,20,12,22,Sarah Ibrahim,2025-01-25 00:00:00,14:00,Completed
+12,9,11,6,Ahmed Saleh,2025-12-05 00:00:00,12:00,Completed
+28,13,4,22,Chen Abegail Mangui,2026-01-27 00:00:00,09:00,Pending
+31,12,12,16,Sarah Ibrahim,2026-02-28 00:00:00,16:00,Pending
+13,14,11,23,Ahmed Saleh,2025-12-09 00:00:00,09:10,Cancelled
+14,11,5,21,Singh Mae Ruffa,2025-10-09 00:00:00,10:00,Completed
+15,20,12,9,Sarah Ibrahim,2025-09-22 00:00:00,07:00,Completed
+16,10,12,14,Sarah Ibrahim,2025-10-30 00:00:00,14:00,Cancelled
+17,19,7,21,Lee Mae Mari,2026-01-24 00:00:00,17:00,Pending
+18,21,10,9,Juan Dela Cruz,2025-12-11 00:00:00,09:00,Completed
+19,12,13,,Khalid Omar,2026-01-10 00:00:00,12:00,Pending
+20,26,8,20,Adelantar David Lee,2026-01-25 00:00:00,12:00,Pending
+21,22,18,22,Lina Oscan,2025-11-13 00:00:00,07:00,Completed
+22,28,11,14,Ahmed Saleh,2026-02-14 00:00:00,06:00,Pending
+23,18,4,16,Chen Abegail Mangui,2025-12-26 00:00:00,09:00,Cancelled
+24,21,8,20,Adelantar David Lee,2025-09-23 00:00:00,16:00,Completed
+25,10,8,21,Adelantar David Lee,2026-01-03 00:00:00,10:00,Cancelled

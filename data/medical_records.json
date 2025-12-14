@@ -1,0 +1,58 @@
+[
+    {
+        "id": 4,
+        "patient_id": 11,
+        "diagnosis": "Acute Periapical Abscess",
+        "prescription": "Amoxicillin or clindamycin (if allergic)\r\nNSAID for pain\r\nWarm saline rinses",
+        "lab_result": "N/A",
+        "record_date": "2025-12-12 14:58:35.555347"
+    },
+    {
+        "id": 5,
+        "patient_id": 17,
+        "diagnosis": "Chronic Periodontitis (Moderate)",
+        "prescription": "hlorhexidine mouth rinse (short-term)\r\nScaling & root planing (SRP)\r\nPeriodontal maintenance every 3\u20134 months",
+        "lab_result": "Periodontal charting: probing depths 5\u20136 mm\r\nRadiograph: horizontal bone loss 30\u201340%",
+        "record_date": "2025-12-12 15:04:03.676495"
+    },
+    {
+        "id": 6,
+        "patient_id": 21,
+        "diagnosis": "Oral Candidiasis",
+        "prescription": "opical antifungal (e.g., nystatin rinse)\r\nAddress risk factors (xerostomia, dentures, recent antibiotics)",
+        "lab_result": "KOH smear: budding yeast & pseudohyphae",
+        "record_date": "2025-12-12 15:05:19.126909"
+    },
+    {
+        "id": 7,
+        "patient_id": 20,
+        "diagnosis": "Acute Bacterial Sinusitis",
+        "prescription": "Amoxicillin\u2013clavulanate\r\n\r\nSaline nasal rinse\r\n\r\nNSAID for facial pressure/headache",
+        "lab_result": "N/A",
+        "record_date": "2025-12-12 15:17:33.630406"
+    },
+    {
+        "id": 8,
+        "patient_id": 20,
+        "diagnosis": "Type 2 Diabetes Mellitus",
+        "prescription": "Metformin\r\n\r\nLifestyle modification (diet, exercise)\r\n\r\nRecommend diabetic foot/eye exam referral",
+        "lab_result": "Fasting Blood Glucose: 162 mg/dL\r\n\r\nHbA1c: 7.6%",
+        "record_date": "2025-12-12 15:18:59.052211"
+    },
+    {
+        "id": 9,
+        "patient_id": 22,
+        "diagnosis": "Viral Gastroenteritis",
+        "prescription": "Oral rehydration solution (ORS)\r\nAntipyretic for fever\r\nAvoid antidiarrheals in young children\r\nEncourage small, frequent fluids",
+        "lab_result": "N/A",
+        "record_date": "2025-12-12 15:30:42.783769"
+    },
+    {
+        "id": 10,
+        "patient_id": 9,
+        "diagnosis": "Streptococcal Pharyngitis",
+        "prescription": "Penicillin or amoxicillin\r\nHydration and rest\r\nAnalgesic for throat pain",
+        "lab_result": "Rapid Strep Test: Positive\r\nThroat culture: optional but may confirm positive result",
+        "record_date": "2025-12-12 15:42:53.544367"
+    }
+]
